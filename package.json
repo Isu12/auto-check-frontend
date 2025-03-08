@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ag-grid-community/all-modules": "^27.3.0",
+    "@ag-grid-community/react": "^32.3.3",
+    "ag-grid-react": "^33.1.1",
+    "axios": "^1.8.2",
     "bootstrap": "^5.3.3",
     "formik": "^2.4.6",
     "next": "15.2.0",

@@ -1,6 +1,7 @@
 import React from "react";
 import { TypeOf, object, string, number } from "zod";
-import { Formik, Form, Field } from "formik";
+import { Formik, Field, Form } from "formik";
+import axios from 'axios';
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
 type ServiceRecordFormInputs = TypeOf<typeof serviceRecordFormSchema>;
@@ -57,10 +58,24 @@ const ServiceRecordForm = () => {
         NextServiceDate: "",
         RecommendedServices: "",
       }}
-      onSubmit={(values) => {
-        alert("Form is submitted");
-        console.log("Form is submitted", values);
+      onSubmit={async (values) => {
+        console.log('Submitted values:', values);  
+        values.ServiceCost = Number(values.ServiceCost);// Add this line
+        try {
+          const response = await axios.post('http://localhost:5555/api/service-record/', values);
+          console.log('Response:', response.data);
+          if (response.status === 201) {
+            alert('Service record submitted successfully!');
+          } else {
+            alert('Failed to submit the service record');
+          }
+        }catch (error) {
+          console.error('Error submitting form:', error);
+          alert('Error submitting form. Please try again later.');
+        }
+        
       }}
+      
       validationSchema={toFormikValidationSchema(serviceRecordFormSchema)}
     >
       {(formikProps) => {
@@ -74,7 +89,7 @@ const ServiceRecordForm = () => {
                 {/* Odometer Reading */}
                 <div className="form-group col-md-6">
                   <label className="form-label">
-                    <span className="label-text">Odometer Reading</span>
+                    <span className="label-text">Odometer Reading (km)</span>
                   </label>
                   <Field
                     type="number"

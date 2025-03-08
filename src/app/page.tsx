@@ -1,5 +1,5 @@
 import Image from "next/image";
-import 'react-pro-sidebar/dist/css/styles.css'; // Global import for styles
+// import 'react-pro-sidebar/dist/css/styles.css'; // Global import for styles
 
 
 export default function Home() {
