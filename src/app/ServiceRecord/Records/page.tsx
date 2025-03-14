@@ -6,6 +6,7 @@ import ServiceRecordGrid from "../Components/ServiceRecordTable";
 export default function Home() {
   return (
     <div>
+    
       <ServiceRecordGrid />
     </div>
   );

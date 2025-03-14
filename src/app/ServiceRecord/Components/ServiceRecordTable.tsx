@@ -1,92 +1,90 @@
 "use client";
 
-// Ensure styles are imported for the grid layout to work
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { AgGridReact } from 'ag-grid-react';
-import { useState, useEffect } from 'react';
-import { ColDef, ModuleRegistry } from 'ag-grid-community'; // Correct imports
-import { ClientSideRowModelModule } from 'ag-grid-community'; // Import the required module
+import { AgGridReact } from "ag-grid-react";
+import { useState, useEffect } from "react";
+import {
+  ColDef,
+  ModuleRegistry,
+  ClientSideRowModelModule,
+  PaginationModule,
+  TextFilterModule,
+  NumberFilterModule,
+  DateFilterModule,
+} from "ag-grid-community";
+import { ServiceRecordInterface } from "./types/ServiceRecord.Interface";
 
-// Register the module needed for client-side row model
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  PaginationModule,
+  TextFilterModule,
+  NumberFilterModule,
+  DateFilterModule
+]);
 
-interface ServiceRecordInterface {
-  OdometerReading: number;
-  DateOfService: string;
-  ServiceType: string;
-  DescriptionOfIssue: string;
-  Diagnosis: string;
-  ServiceDetails: string;
-  PartsUsed: string;
-  ServiceCost: number;
-  WarrantyInfo: string;
-  NextServiceDate: string;
-  RecommendedServices: string;
-}
+
 
 const ServiceRecordGrid = () => {
-  const [rowData, setRowData] = useState<ServiceRecordInterface[]>([]); // Correctly typed state for the data
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state, type refined to string | null
+  const [rowData, setRowData] = useState<ServiceRecordInterface[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Column definitions for the grid
   const [colDefs] = useState<ColDef[]>([
-    { field: "OdometerReading", headerName: "Odometer Reading" },
-    { field: "DateOfService", headerName: "Date of Service" },
-    { field: "ServiceType", headerName: "Service Type" },
-    { field: "DescriptionOfIssue", headerName: "Description of Issue" },
-    { field: "Diagnosis", headerName: "Diagnosis" },
-    { field: "ServiceDetails", headerName: "Service Details" },
-    { field: "PartsUsed", headerName: "Parts Used" },
+    { field: "OdometerReading", headerName: "Odometer Reading", filter: "agNumberColumnFilter"},
+    { field: "DateOfService", headerName: "Date of Service", filter: "agDateColumnFilter"},
+    { field: "ServiceType", headerName: "Service Type", filter: "agTextColumnFilter"},
+    { field: "DescriptionOfIssue", headerName: "Description of Issue", filter: "agTextColumnFilter"},
+    { field: "Diagnosis", headerName: "Diagnosis", filter: "agTextColumnFilter" },
+    { field: "ServiceDetails", headerName: "Service Details", filter: "agTextColumnFilter"},
+    { field: "PartsUsed", headerName: "Parts Used", filter: "agTextColumnFilter"},
     {
       field: "ServiceCost",
       headerName: "Service Cost",
-      valueFormatter: (params) => `$${params.value}`, // Optional formatting for currency
+      filter: "agNumberColumnFilter",
+      valueFormatter: (params) => `$${params.value}`,
     },
-    { field: "WarrantyInfo", headerName: "Warranty Info" },
-    { field: "NextServiceDate", headerName: "Next Service Date" },
-    { field: "RecommendedServices", headerName: "Recommended Services" },
+    { field: "WarrantyInfo", headerName: "Warranty Info", filter: "agTextColumnFilter" },
+    { field: "NextServiceDate", headerName: "Next Service Date", filter: "agDateColumnFilter"},
+    { field: "RecommendedServices", headerName: "Recommended Services", filter: "agTextColumnFilter"},
   ]);
 
-  // Fetch data when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5555/api/service-record/');
+        const response = await fetch("http://localhost:5555/api/service-record/");
         if (!response.ok) {
-          throw new Error('Failed to fetch service records');
+          throw new Error("Failed to fetch service records");
         }
         const data = await response.json();
-        setRowData(data); // Set the fetched data in state
+        setRowData(data);
       } catch (error: any) {
-        setError(error.message); // Handle errors
+        setError(error.message);
       } finally {
-        setLoading(false); // Stop the loading state
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []); // Empty dependency array means this runs once when the component mounts
+  }, []);
 
-  // Show loading message if data is still being fetched
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  // Show error message if there's an error fetching data
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="ag-theme-quartz" style={{ height: 400, width: "100%" }}>
+    <div className="ag-theme-quartz" style={{ height: 500, width: "100%" }}>
       <AgGridReact
         rowData={rowData}
         columnDefs={colDefs}
         pagination={true}
+        paginationPageSize={10}
         domLayout="autoHeight"
-        rowModelType="clientSide" // Set rowModelType as clientSide (default for client-side operations)
+        rowModelType="clientSide"
+        modules={[
+          ClientSideRowModelModule,
+          PaginationModule,
+          DateFilterModule,
+          TextFilterModule,
+          NumberFilterModule
+        ]}
       />
     </div>
   );
