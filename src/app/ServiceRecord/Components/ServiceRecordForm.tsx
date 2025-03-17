@@ -3,16 +3,22 @@ import { TypeOf, object, string, number } from "zod";
 import { Formik, Field, Form } from "formik";
 import axios from 'axios';
 import { toFormikValidationSchema } from "zod-formik-adapter";
+// import { useRouter } from 'next/router';  // Import useRouter for navigation
 
 type ServiceRecordFormInputs = TypeOf<typeof serviceRecordFormSchema>;
 
 const serviceRecordFormSchema = object({
   OdometerReading: number({
     required_error: "Please enter your Odometer Reading",
-  }),
+  })
+    .min(1, "Odometer Reading must be at least 1 km")
+    .max(999999, "Odometer Reading is too high"),
   DateOfService: string({
     required_error: "Please enter the date of service",
-  }),
+  }).refine(
+    (date) => !isNaN(Date.parse(date)),
+    { message: "Invalid date format" }
+  ),
   ServiceType: string({
     required_error: "Please Enter the Service Type",
   }),
@@ -36,13 +42,18 @@ const serviceRecordFormSchema = object({
   }),
   NextServiceDate: string({
     required_error: "Please enter the next service date",
-  }),
-  RecommendedServices: string({
-    required_error: "Please enter recommended services",
-  }),
+  }).refine(
+    (date) => !isNaN(Date.parse(date)),
+    { message: "Invalid date format" }
+  ),
+  // RecommendedServices: string({
+  //   required_error: "Please enter recommended services",
+  // }),
 });
 
 const ServiceRecordForm = () => {
+  // const router = useRouter(); // Initialize router
+
   return (
     <Formik<ServiceRecordFormInputs>
       initialValues={{
@@ -56,26 +67,23 @@ const ServiceRecordForm = () => {
         ServiceCost: 0,
         WarrantyInfo: "",
         NextServiceDate: "",
-        RecommendedServices: "",
       }}
       onSubmit={async (values) => {
-        console.log('Submitted values:', values);  
-        values.ServiceCost = Number(values.ServiceCost);// Add this line
+        console.log('Submitted values:', values);
+        values.ServiceCost = Number(values.ServiceCost); // Ensure ServiceCost is a number
         try {
           const response = await axios.post('http://localhost:5555/api/service-record/', values);
           console.log('Response:', response.data);
           if (response.status === 201) {
-            alert('Service record submitted successfully!');
+            window.alert("Service record added.");
           } else {
-            alert('Failed to submit the service record');
+            window.alert('Failed to submit the service record');
           }
-        }catch (error) {
+        } catch (error) {
           console.error('Error submitting form:', error);
-          alert('Error submitting form. Please try again later.');
+          window.alert('Error submitting form. Please try again later.');
         }
-        
       }}
-      
       validationSchema={toFormikValidationSchema(serviceRecordFormSchema)}
     >
       {(formikProps) => {
@@ -283,11 +291,6 @@ const ServiceRecordForm = () => {
                   className="form-control"
                   placeholder="e.g., Air filter replacement"
                 />
-                {errors.RecommendedServices && (
-                  <div className="form-text text-danger">
-                    {errors.RecommendedServices}
-                  </div>
-                )}
               </div>
 
               {/* Submit Button */}

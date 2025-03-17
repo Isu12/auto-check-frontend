@@ -3,15 +3,16 @@
 /* General styles */
 .sidebar {
   position: fixed;
-  top: 0;
+  top: 78;
   left: 0;
   height: 100%;
   width: 100px; /* Default partially open width */
-  background-color: #470e00; /* Light Orange */
+  background-color: #205781; /* Light Orange */
   color: #fef9e4; /* Light Yellow */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); */
   transition: transform 0.3s ease-in-out, width 0.3s ease;
   transform: translateX(0);
+  z-index: 20;
 }
 
 .sidebar.open {
@@ -19,14 +20,14 @@
 }
 
 .sidebar.closed {
-  width: 120px; /* Partial width when closed */
+  width: 80px; /* Partial width when closed */
 }
 
 .sidebarToggle {
   position: absolute;
   top: 20px;
   right: -30px; /* Adjust based on your sidebar width */
-  background-color: #b15200; /* Darker Orange */
+  background-color: #4F959D; /* Darker Orange */
   color: #fef9e4; /* Light Yellow */
   border: none;
   padding: 10px;
@@ -37,13 +38,13 @@
 }
 
 .sidebarToggle:hover {
-  background-color: #d35400; /* Even darker orange */
+  background-color: #034C53; /* Even darker orange */
 }
 
 .sidebarNav {
   display: flex;
   flex-direction: column;
-  padding-top: 60px;
+  padding-top: 10px;
 }
 
 .sidebarNav ul {
@@ -67,7 +68,7 @@
 }
 
 .sidebarItem:hover {
-  background-color: #a52b1b; /* Darker Orange */
+  background-color: #034C53; /* Darker Orange */
 }
 
 .sidebarItem .icon {
