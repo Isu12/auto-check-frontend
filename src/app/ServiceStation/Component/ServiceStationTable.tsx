@@ -1,5 +1,5 @@
 "use client";
-
+import ConfirmationDialog from "../../../Components/ConfirmationDialog";
 import { AgGridReact } from "ag-grid-react";
 import { useState, useEffect } from "react";
 import {
@@ -12,6 +12,8 @@ import {
   DateFilterModule,
 } from "ag-grid-community";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
+import { Trash2 } from "lucide-react";
+
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -26,7 +28,10 @@ const StationInfoGrid = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [colDefs] = useState<ColDef[]>([
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const [colDefs] = useState<ColDef[]>([ 
     { field: "businessRegNo", headerName: "Business Reg No", filter: "agTextColumnFilter" },
     { field: "businessName", headerName: "Business Name", filter: "agTextColumnFilter" },
     { field: "branch", headerName: "Branch", filter: "agTextColumnFilter" },
@@ -40,7 +45,24 @@ const StationInfoGrid = () => {
     { field: "contactNumber", headerName: "Contact Number", filter: "agTextColumnFilter" },
     { field: "email2", headerName: "Alternate Email", filter: "agTextColumnFilter" },
     { field: "webUrl", headerName: "Website URL", filter: "agTextColumnFilter" },
+
+    {
+      field: "actions",
+      headerName: "Actions",
+      cellRenderer: (params: { data: { _id: string } }) => {
+        return (
+          <button onClick={() => handleDeleteClick(params.data._id)}>
+            <Trash2 size={20} color="red" />
+          </button>
+        );
+      },
+      sortable: false,
+      filter: false,
+    },
+
   ]);
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +82,34 @@ const StationInfoGrid = () => {
 
     fetchData();
   }, []);
+
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      const response = await fetch(`http://localhost:5555/api/stations/${deleteId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete service record");
+      }
+
+      // Remove the deleted record from state
+      setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
+      window.alert("Service Record Deleted"); // Replaced toast success
+    } catch (error: any) {
+      window.alert("Error deleting record: " + error.message); // Replaced toast error
+    } finally {
+      setIsDialogOpen(false);
+      setDeleteId(null);
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -81,6 +131,16 @@ const StationInfoGrid = () => {
     NumberFilterModule
   ]}
 />
+
+ {/* Confirmation Dialog */}
+ <ConfirmationDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        message="Are you sure you want to delete this service record?"
+        title="Delete Confirmation"
+      />
+
     </div>
   );
 };
