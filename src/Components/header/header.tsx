@@ -1,64 +1,34 @@
+import React from "react";
+import { User, Settings } from "lucide-react"; // Icons for user and settings
+import { Button } from "../ui/button";
 
-"use client";
-
-import React, { useState } from "react";
-import Link from "next/link";
-import { cn } from "@/lib/utils"; // Adjust this import as per your setup
-import { ArrowLeft, ArrowRight, House, Car, Phone, Cog, LayoutDashboard} from "lucide-react"; // Import the icons from Lucide
-import styles from "./side-nav.module.css"; // Import the updated CSS Module
-
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false); // Start with sidebar partially open
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
+const Header: React.FC = () => {
   return (
-    <div className={cn(styles.sidebar, isOpen ? styles.open : styles.closed)}>
-      <button onClick={toggleSidebar} className={styles.sidebarToggle}>
-        {isOpen ? <ArrowLeft /> : <ArrowRight />} {/* Use Lucide icons for toggle */}
-      </button>
+    <header className="text-white py-3 px-6 shadow-md flex items-center justify-between fixed top-0 left-0 right-0 z-10"
+    style={{ backgroundColor: "#205781" }}>
+      {/* Logo on the left */}
+      <div className="flex items-center gap-3">
+        <img src="/logo.png" alt="System Logo" className="w-8 h-8" /> {/* Logo path updated */}
+        <h2 className="text-xl font-semibold tracking-wide">AutoCheck</h2>
+      </div>
 
-      <nav className={styles.sidebarNav}>
-        <ul>
-          <li>
-            <Link href="/" className={styles.sidebarItem}>
-              <span className={styles.icon}><House size={28} /></span> {/* Only show icon initially */}
-              {isOpen && <span className={styles.itemName}>Home</span>} {/* Show name when expanded */}
-            </Link>
-          </li>
-          <li>
-            <Link href="/contact" className={styles.sidebarItem}>
-              <span className={styles.icon}><LayoutDashboard size={28} /></span> {/* Only show icon initially */}
-              {isOpen && <span className={styles.itemName}>Dashboard</span>} {/* Show name when expanded */}
-            </Link>
-          </li>
-          <li>
-            <Link href="/about" className={styles.sidebarItem}>
-              <span className={styles.icon}><Car size={28} /></span> {/* Only show icon initially */}
-              {isOpen && <span className={styles.itemName}>Vehicles</span>} {/* Show name when expanded */}
-            </Link>
-          </li>
-          <li>
-            <Link href="/services" className={styles.sidebarItem}>
-              <span className={styles.icon}><Cog size={28} /></span> {/* Only show icon initially */}
-              {isOpen && <span className={styles.itemName}>Service Centers</span>} {/* Show name when expanded */}
-            </Link>
-          </li>
-          <li>
-            <Link href="/contact" className={styles.sidebarItem}>
-              <span className={styles.icon}><Phone size={28} /></span> {/* Only show icon initially */}
-              {isOpen && <span className={styles.itemName}>Contact</span>} {/* Show name when expanded */}
-            </Link>
-          </li>
+      {/* Clean middle space */}
+      <div className="flex-1"></div> {/* This takes up the middle space */}
 
-
-          
-        </ul>
-      </nav>
-    </div>
+      {/* User details and actions on the right */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-gray-300">John Doe</span> {/* User name */}
+          <span className="text-gray-400 text-sm">(Admin)</span> {/* User role */}
+        </div>
+        <Button variant="ghost">
+        </Button>
+        <Button variant="ghost">
+          <User className="w-5 h-5 text-gray-300 hover:text-white" />
+        </Button>
+      </div>
+    </header>
   );
 };
 
-export default Sidebar;
+export default Header;

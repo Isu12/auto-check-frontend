@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="flex relative">
           <Sidebar /> {/* Sidebar on the left */}
-          {/* <Header /> */}
+          <Header/>
           <main className="flex-1 p-4 transition-all duration-200 ml-[100px] md:ml-[100px] mt-[120px]">
             {/* Add margin-top to offset header */}
             {children}
