@@ -22,7 +22,6 @@ const Header: React.FC = () => {
           <span className="text-gray-400 text-sm">(Admin)</span> {/* User role */}
         </div>
         <Button variant="ghost">
-          <Settings className="w-5 h-5 text-gray-300 hover:text-white" />
         </Button>
         <Button variant="ghost">
           <User className="w-5 h-5 text-gray-300 hover:text-white" />

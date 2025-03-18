@@ -125,3 +125,12 @@
   }
 }
 
+.ag-theme-quartz .ag-cell {
+  font-size: 16px;
+   /* Adjust as needed */
+}
+
+.ag-theme-quartz .ag-header-cell-label {
+  font-size: 18px; /* Adjust header font size */
+  font-weight: bold;
+}

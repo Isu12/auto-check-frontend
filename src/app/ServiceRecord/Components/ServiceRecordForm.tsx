@@ -1,11 +1,13 @@
-import React from "react";
-import { TypeOf, object, string, number } from "zod";
+import React, { useState } from "react";
+import { Modal, Button } from "react-bootstrap";
 import { Formik, Field, Form } from "formik";
 import axios from 'axios';
 import { toFormikValidationSchema } from "zod-formik-adapter";
-// import { useRouter } from 'next/router';  // Import useRouter for navigation
-
-type ServiceRecordFormInputs = TypeOf<typeof serviceRecordFormSchema>;
+import { object, string, number } from "zod";
+import ServiceRecordGrid from "./ServiceRecordTable";
+import { createServiceRecord } from "../../ServiceRecord/Services/ServiceRecord.service";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const serviceRecordFormSchema = object({
   OdometerReading: number({
@@ -28,7 +30,7 @@ const serviceRecordFormSchema = object({
   Diagnosis: string({
     required_error: "Please enter the diagnosis",
   }),
-  ServiceRepairDetails: string({
+  ServiceDetails: string({
     required_error: "Please enter service/repair details",
   }),
   PartsUsed: string({
@@ -46,271 +48,281 @@ const serviceRecordFormSchema = object({
     (date) => !isNaN(Date.parse(date)),
     { message: "Invalid date format" }
   ),
-  // RecommendedServices: string({
-  //   required_error: "Please enter recommended services",
-  // }),
+  RecommendedServices: string({
+    required_error: "Please enter recommended services",
+  }),
 });
 
 const ServiceRecordForm = () => {
-  // const router = useRouter(); // Initialize router
+  const [showModal, setShowModal] = useState(false);
+
+  const handleClose = () => setShowModal(false);
+  const handleShow = () => setShowModal(true);
 
   return (
-    <Formik<ServiceRecordFormInputs>
-      initialValues={{
-        OdometerReading: 0,
-        DateOfService: "",
-        ServiceType: "",
-        DescriptionOfIssue: "",
-        Diagnosis: "",
-        ServiceRepairDetails: "",
-        PartsUsed: "",
-        ServiceCost: 0,
-        WarrantyInfo: "",
-        NextServiceDate: "",
-      }}
-      onSubmit={async (values) => {
-        console.log('Submitted values:', values);
-        values.ServiceCost = Number(values.ServiceCost); // Ensure ServiceCost is a number
-        try {
-          const response = await axios.post('http://localhost:5555/api/service-record/', values);
-          console.log('Response:', response.data);
-          if (response.status === 201) {
-            window.alert("Service record added.");
-          } else {
-            window.alert('Failed to submit the service record');
-          }
-        } catch (error) {
-          console.error('Error submitting form:', error);
-          window.alert('Error submitting form. Please try again later.');
-        }
-      }}
-      validationSchema={toFormikValidationSchema(serviceRecordFormSchema)}
-    >
-      {(formikProps) => {
-        const errors = formikProps.errors;
-        return (
-          <div className="card shadow">
-            <Form className="card-body">
-              <div className="card-title h4 font-weight-bold">Service Record</div>
+    <>
+      <Button variant="primary" onClick={handleShow} className="mb-3">
+        Add Service Record
+      </Button>
 
-              <div className="row">
-                {/* Odometer Reading */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Odometer Reading (km)</span>
-                  </label>
-                  <Field
-                    type="number"
-                    name="OdometerReading"
-                    className="form-control"
-                  />
-                  {errors.OdometerReading && (
-                    <div className="form-text text-danger">
-                      {errors.OdometerReading}
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Service Record Form</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Formik
+            initialValues={{
+              OdometerReading: 0,
+              DateOfService: "",
+              ServiceType: "",
+              DescriptionOfIssue: "",
+              Diagnosis: "",
+              ServiceDetails: "",
+              PartsUsed: "",
+              ServiceCost: 0,
+              WarrantyInfo: "",
+              NextServiceDate: "",
+              RecommendedServices: "",
+            }}
+            onSubmit={async (values) => {
+              console.log("Submitted values:", values);
+              values.ServiceCost = Number(values.ServiceCost); // Ensure ServiceCost is a number
+              try {
+                const data = await createServiceRecord(values); // Pass the full object
+                console.log("Response:", data);
+                toast.success("Service record added successfully!");                
+                handleClose();
+              } catch (error: any) {
+                toast.error(`Error: ${error.message}`);
+              }
+            }}
+            validationSchema={toFormikValidationSchema(serviceRecordFormSchema)}
+          >
+            {(formikProps) => {
+              const errors = formikProps.errors;
+              return (
+                <Form className="card-body">
+
+                  <div className="row">
+                    {/* Odometer Reading */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Odometer Reading (km)</span>
+                      </label>
+                      <Field
+                        type="number"
+                        name="OdometerReading"
+                        className="form-control"
+                      />
+                      {errors.OdometerReading && (
+                        <div className="form-text text-danger">
+                          {errors.OdometerReading}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Date of Service */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Date of Service</span>
-                  </label>
-                  <Field
-                    type="date"
-                    name="DateOfService"
-                    className="form-control"
-                  />
-                  {errors.DateOfService && (
-                    <div className="form-text text-danger">
-                      {errors.DateOfService}
+                    {/* Date of Service */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Date of Service</span>
+                      </label>
+                      <Field
+                        type="date"
+                        name="DateOfService"
+                        className="form-control"
+                      />
+                      {errors.DateOfService && (
+                        <div className="form-text text-danger">
+                          {errors.DateOfService}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              <div className="row">
-                {/* Service Type */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Service Type</span>
-                  </label>
-                  <Field
-                    type="text"
-                    name="ServiceType"
-                    className="form-control"
-                    placeholder="e.g., Oil Change"
-                  />
-                  {errors.ServiceType && (
-                    <div className="form-text text-danger">
-                      {errors.ServiceType}
+                  <div className="row">
+                    {/* Service Type */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Service Type</span>
+                      </label>
+                      <Field
+                        type="text"
+                        name="ServiceType"
+                        className="form-control"
+                        placeholder="e.g., Oil Change"
+                      />
+                      {errors.ServiceType && (
+                        <div className="form-text text-danger">
+                          {errors.ServiceType}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Service Cost */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Service Cost</span>
-                  </label>
-                  <Field
-                    type="number"
-                    name="ServiceCost"
-                    className="form-control"
-                    placeholder="e.g., 150"
-                  />
-                  {errors.ServiceCost && (
-                    <div className="form-text text-danger">
-                      {errors.ServiceCost}
+                    {/* Service Cost */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Service Cost</span>
+                      </label>
+                      <Field
+                        type="number"
+                        name="ServiceCost"
+                        className="form-control"
+                        placeholder="e.g., 150"
+                      />
+                      {errors.ServiceCost && (
+                        <div className="form-text text-danger">
+                          {errors.ServiceCost}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              <div className="row">
-                {/* Description of Issue */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Description of Issue</span>
-                  </label>
-                  <Field
-                    as="textarea"
-                    name="DescriptionOfIssue"
-                    className="form-control"
-                    placeholder="e.g., Engine not starting"
-                  />
-                  {errors.DescriptionOfIssue && (
-                    <div className="form-text text-danger">
-                      {errors.DescriptionOfIssue}
+                  <div className="row">
+                    {/* Description of Issue */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Description of Issue</span>
+                      </label>
+                      <Field
+                        as="textarea"
+                        name="DescriptionOfIssue"
+                        className="form-control"
+                        placeholder="e.g., Engine not starting"
+                      />
+                      {errors.DescriptionOfIssue && (
+                        <div className="form-text text-danger">
+                          {errors.DescriptionOfIssue}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Diagnosis */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Diagnosis</span>
-                  </label>
-                  <Field
-                    as="textarea"
-                    name="Diagnosis"
-                    className="form-control"
-                    placeholder="e.g., Faulty starter motor"
-                  />
-                  {errors.Diagnosis && (
-                    <div className="form-text text-danger">
-                      {errors.Diagnosis}
+                    {/* Diagnosis */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Diagnosis</span>
+                      </label>
+                      <Field
+                        as="textarea"
+                        name="Diagnosis"
+                        className="form-control"
+                        placeholder="e.g., Faulty starter motor"
+                      />
+                      {errors.Diagnosis && (
+                        <div className="form-text text-danger">
+                          {errors.Diagnosis}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              <div className="row">
-                {/* Service/Repair Details */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Service / Repair Details</span>
-                  </label>
-                  <Field
-                    as="textarea"
-                    name="ServiceRepairDetails"
-                    className="form-control"
-                    placeholder="e.g., Replaced starter motor"
-                  />
-                  {errors.ServiceRepairDetails && (
-                    <div className="form-text text-danger">
-                      {errors.ServiceRepairDetails}
+                  <div className="row">
+                    {/* Service/Repair Details */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Service / Repair Details</span>
+                      </label>
+                      <Field
+                        as="textarea"
+                        name="ServiceDetails"
+                        className="form-control"
+                        placeholder="e.g., Replaced starter motor"
+                      />
+                      {errors.ServiceDetails && (
+                        <div className="form-text text-danger">
+                          {errors.ServiceDetails}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Parts Used */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Parts Used</span>
-                  </label>
-                  <Field
-                    as="textarea"
-                    name="PartsUsed"
-                    className="form-control"
-                    placeholder="e.g., Starter Motor"
-                  />
-                  {errors.PartsUsed && (
-                    <div className="form-text text-danger">
-                      {errors.PartsUsed}
+                    {/* Parts Used */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Parts Used</span>
+                      </label>
+                      <Field
+                        as="textarea"
+                        name="PartsUsed"
+                        className="form-control"
+                        placeholder="e.g., Starter Motor"
+                      />
+                      {errors.PartsUsed && (
+                        <div className="form-text text-danger">
+                          {errors.PartsUsed}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              <div className="row">
-                {/* Warranty Info */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Warranty Information</span>
-                  </label>
-                  <Field
-                    type="text"
-                    name="WarrantyInfo"
-                    className="form-control"
-                    placeholder="e.g., 1-year warranty"
-                  />
-                  {errors.WarrantyInfo && (
-                    <div className="form-text text-danger">
-                      {errors.WarrantyInfo}
+                  <div className="row">
+                    {/* Warranty Info */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Warranty Information</span>
+                      </label>
+                      <Field
+                        type="text"
+                        name="WarrantyInfo"
+                        className="form-control"
+                        placeholder="e.g., 1-year warranty"
+                      />
+                      {errors.WarrantyInfo && (
+                        <div className="form-text text-danger">
+                          {errors.WarrantyInfo}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Next Service Date */}
-                <div className="form-group col-md-6">
-                  <label className="form-label">
-                    <span className="label-text">Next Service Date</span>
-                  </label>
-                  <Field
-                    type="date"
-                    name="NextServiceDate"
-                    className="form-control"
-                  />
-                  {errors.NextServiceDate && (
-                    <div className="form-text text-danger">
-                      {errors.NextServiceDate}
+                    {/* Next Service Date */}
+                    <div className="form-group col-md-6">
+                      <label className="form-label">
+                        <span className="label-text">Next Service Date</span>
+                      </label>
+                      <Field
+                        type="date"
+                        name="NextServiceDate"
+                        className="form-control"
+                      />
+                      {errors.NextServiceDate && (
+                        <div className="form-text text-danger">
+                          {errors.NextServiceDate}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              {/* Recommended Services */}
-              <div className="form-group">
-                <label className="form-label">
-                  <span className="label-text">Recommended Services</span>
-                </label>
-                <Field
-                  as="textarea"
-                  name="RecommendedServices"
-                  className="form-control"
-                  placeholder="e.g., Air filter replacement"
-                />
-              </div>
+                  {/* Recommended Services */}
+                  <div className="form-group">
+                    <label className="form-label">
+                      <span className="label-text">Recommended Services</span>
+                    </label>
+                    <Field
+                      as="textarea"
+                      name="RecommendedServices"
+                      className="form-control"
+                      placeholder="e.g., Air filter replacement"
+                    />
+                  </div>
 
-              {/* Submit Button */}
-              <div className="card-actions justify-content-end mt-4">
-                <button className="btn btn-primary" type="submit">
-                  Submit
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary m-4"
-                  onClick={() => formikProps.resetForm()}
-                >
-                  Reset
-                </button>
-              </div>
-            </Form>
-          </div>
-        );
-      }}
-    </Formik>
+                  {/* Submit Button */}
+                  <div className="card-actions justify-content-end mt-4">
+                    <button className="btn btn-primary" type="submit">
+                      Submit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary m-4"
+                      onClick={() => formikProps.resetForm({ values: formikProps.initialValues })}
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </Form>
+              );
+            }}
+          </Formik>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 

@@ -16,11 +16,11 @@
 }
 
 .sidebar.open {
-  width: 250px; /* Full width when opened */
+  width: 15rem; /* Full width when opened */
 }
 
 .sidebar.closed {
-  width: 80px; /* Partial width when closed */
+  width: 5rem; /* Partial width when closed */
 }
 
 .sidebarToggle {

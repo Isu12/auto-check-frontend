@@ -1,5 +1,3 @@
-"use client";
-
 import { AgGridReact } from "ag-grid-react";
 import { useState, useEffect } from "react";
 import {
@@ -10,10 +8,23 @@ import {
   TextFilterModule,
   NumberFilterModule,
   DateFilterModule,
+  GridApi,
+  CsvExportModule,
 } from "ag-grid-community";
-import { ServiceRecordInterface } from "./types/ServiceRecord.Interface";
-import { Trash2 } from "lucide-react";
+import { ServiceRecordInterface } from "../types/ServiceRecord.Interface";
+import { Trash2, FilePen, Download, Search, Edit } from "lucide-react";
 import ConfirmationDialog from "../../../components/ConfirmationDialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  fetchServiceRecords,
+  deleteServiceRecord,
+} from "../../ServiceRecord/Services/ServiceRecord.service";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+// Optional: Install and import a spinner library
+import { ClipLoader } from "react-spinners";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -21,6 +32,7 @@ ModuleRegistry.registerModules([
   TextFilterModule,
   NumberFilterModule,
   DateFilterModule,
+  CsvExportModule,
 ]);
 
 const ServiceRecordGrid = () => {
@@ -30,6 +42,28 @@ const ServiceRecordGrid = () => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editRecord, setEditRecord] = useState<ServiceRecordInterface | null>(null);
+  const [gridApi, setGridApi] = useState<GridApi | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const onGridReady = (params: any) => {
+    setGridApi(params.api);
+  };
+
+  const exportToExcel = () => {
+    gridApi!.exportDataAsCsv();
+  };
+
+  const handleEditClick = (record: ServiceRecordInterface) => {
+    setEditRecord(record);
+    setIsDialogOpen(true); // Open the form in edit mode
+  };
+
+  const filteredRowData = rowData.filter((record) =>
+    Object.values(record).some((value) =>
+      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   const [colDefs] = useState<ColDef[]>([
     { field: "OdometerReading", headerName: "Odometer Reading", filter: "agNumberColumnFilter" },
@@ -67,30 +101,32 @@ const ServiceRecordGrid = () => {
     {
       field: "actions",
       headerName: "Actions",
-      cellRenderer: (params: { data: { _id: string } }) => {
+      cellRenderer: (params: { data: ServiceRecordInterface }) => {
         return (
-          <button onClick={() => handleDeleteClick(params.data._id)}>
-            <Trash2 size={20} color="red" />
-          </button>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button onClick={() => params.data._id && handleDeleteClick(params.data._id)}>
+              <Trash2 size={24} color="red" className="ml-3" />
+            </button>
+
+            <button onClick={() => handleEditClick(params.data)}>
+              <Edit size={24} color="navy" className="ml-3" />
+            </button>
+          </div>
         );
       },
       sortable: false,
       filter: false,
-    },
+    }
   ]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5555/api/service-record/");
-        if (!response.ok) {
-          throw new Error("Failed to fetch service records");
-        }
-        const data = await response.json();
+        const data = await fetchServiceRecords();
         setRowData(data);
       } catch (error: any) {
         setError(error.message);
-        window.alert("Error fetching data: " + error.message); // Replaced toast error
+        window.alert("Error fetching data: " + error.message);
       } finally {
         setLoading(false);
       }
@@ -108,47 +144,55 @@ const ServiceRecordGrid = () => {
     if (!deleteId) return;
 
     try {
-      const response = await fetch(`http://localhost:5555/api/service-record/${deleteId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete service record");
-      }
-
+      await deleteServiceRecord(deleteId);
       // Remove the deleted record from state
       setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
-      window.alert("Service Record Deleted"); // Replaced toast success
+      toast.success("Service record deleted successfully!");
     } catch (error: any) {
-      window.alert("Error deleting record: " + error.message); // Replaced toast error
+      toast.error("Error! Deleting the service record");
     } finally {
       setIsDialogOpen(false);
       setDeleteId(null);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <ClipLoader size={50} color={"#3498db"} />
+      </div>
+    );
+  }
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="ag-theme-quartz" style={{ height: 500, width: "100%" }}>
+      <div className="mb-4 flex justify-end">
+        <div className="relative w-full max-w-md mr-5">
+          <Search className="absolute right-4 mt-2 text-gray-400" size={18} />
+          <Input
+            className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:ring focus:ring-blue-200"
+            type="text"
+            placeholder="Search service records..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Button onClick={exportToExcel} variant={"outline"}>
+          Download CSV
+          <Download color="black" size={28} />
+        </Button>
+      </div>
       <AgGridReact
-        rowData={rowData}
+        rowData={filteredRowData}
         columnDefs={colDefs}
         pagination={true}
-        paginationPageSize={10}
+        paginationPageSize={15}
         domLayout="autoHeight"
         rowModelType="clientSide"
-        modules={[
-          ClientSideRowModelModule,
-          PaginationModule,
-          DateFilterModule,
-          TextFilterModule,
-          NumberFilterModule,
-        ]}
+        onGridReady={onGridReady}
       />
 
-      {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
