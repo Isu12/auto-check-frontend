@@ -1,4 +1,3 @@
-"use client";
 import ConfirmationDialog from "../../../Components/ConfirmationDialog";
 import { AgGridReact } from "ag-grid-react";
 import { useState, useEffect } from "react";
@@ -14,8 +13,10 @@ import {
   GridApi,
 } from "ag-grid-community";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Trash2, Eye } from "lucide-react"; // Added Eye icon for viewing
 import { Button } from "@/Components/ui/button";
+import Modal from "../Component/Modal";
+import ViewServiceRecordModal from "../Component/Modal";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -34,6 +35,8 @@ const StationInfoGrid = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedStation, setSelectedStation] = useState<StationInfoInterface | null>(null);
 
   const onGridReady = (params: any) => {
     setGridApi(params.api);
@@ -43,65 +46,71 @@ const StationInfoGrid = () => {
     gridApi!.exportDataAsCsv();
   };
 
+  const handleEyeClick = (record: StationInfoInterface) => {
+    setSelectedStation(record); // Replace setSelectedRecord with setSelectedStation
+    setIsViewModalOpen(true); // This will trigger the modal open
+  };
+  
+
+  const handleCloseViewModal = () => {
+    setSelectedStation(null); // Reset to null instead of selectedRecord
+    setIsViewModalOpen(false); // Close the modal
+  };
+  
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+    setIsDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      const response = await fetch(`http://localhost:5555/api/stations/${deleteId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete service record");
+      }
+
+      setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
+      window.alert("Service Record Deleted");
+    } catch (error: any) {
+      window.alert("Error deleting record: " + error.message);
+    } finally {
+      setIsDialogOpen(false);
+      setDeleteId(null);
+    }
+  };
+
   const [colDefs] = useState<ColDef[]>([
-    {
-      field: "businessRegNo",
-      headerName: "Business Reg No",
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "businessName",
-      headerName: "Business Name",
-      filter: "agTextColumnFilter",
-    },
+    { field: "businessRegNo", headerName: "Business Reg No", filter: "agTextColumnFilter" },
+    { field: "businessName", headerName: "Business Name", filter: "agTextColumnFilter" },
     { field: "branch", headerName: "Branch", filter: "agTextColumnFilter" },
     { field: "address", headerName: "Address", filter: "agTextColumnFilter" },
     { field: "city", headerName: "City", filter: "agTextColumnFilter" },
-    {
-      field: "postalCode",
-      headerName: "Postal Code",
-      filter: "agNumberColumnFilter",
-    },
+    { field: "postalCode", headerName: "Postal Code", filter: "agNumberColumnFilter" },
     { field: "email", headerName: "Email", filter: "agTextColumnFilter" },
-    {
-      field: "phoneNumber1",
-      headerName: "Phone Number 1",
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "phoneNumber2",
-      headerName: "Phone Number 2",
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "ownerName",
-      headerName: "Owner Name",
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "contactNumber",
-      headerName: "Contact Number",
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "email2",
-      headerName: "Alternate Email",
-      filter: "agTextColumnFilter",
-    },
-    {
-      field: "webUrl",
-      headerName: "Website URL",
-      filter: "agTextColumnFilter",
-    },
-
+    { field: "phoneNumber1", headerName: "Phone Number 1", filter: "agTextColumnFilter" },
+    { field: "phoneNumber2", headerName: "Phone Number 2", filter: "agTextColumnFilter" },
+    { field: "ownerName", headerName: "Owner Name", filter: "agTextColumnFilter" },
+    { field: "contactNumber", headerName: "Contact Number", filter: "agTextColumnFilter" },
+    { field: "email2", headerName: "Alternate Email", filter: "agTextColumnFilter" },
+    { field: "webUrl", headerName: "Website URL", filter: "agTextColumnFilter" },
     {
       field: "actions",
       headerName: "Actions",
-      cellRenderer: (params: { data: { _id: string } }) => {
+      cellRenderer: (params: { data: StationInfoInterface }) => {
         return (
-          <button onClick={() => handleDeleteClick(params.data._id)}>
-            <Trash2 size={20} color="red" />
-          </button>
+          <div style={{ display: "flex", gap: "10px" }} className="action-buttons">
+            <button onClick={() => handleEyeClick(params.data)}>
+              <Eye size={24} color="green" className="ml-3" /> {/* Eye icon for viewing */}
+            </button>
+            <button onClick={() => handleDeleteClick(params.data._id ?? "")}>
+              <Trash2 size={24} color="red" className="ml-3" />
+            </button>
+          </div>
         );
       },
       sortable: false,
@@ -128,46 +137,13 @@ const StationInfoGrid = () => {
     fetchData();
   }, []);
 
-  const handleDeleteClick = (id: string) => {
-    setDeleteId(id);
-    setIsDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteId) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:5555/api/stations/${deleteId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete service record");
-      }
-
-      // Remove the deleted record from state
-      setRowData((prevData) =>
-        prevData.filter((record) => record._id !== deleteId)
-      );
-      window.alert("Service Record Deleted"); // Replaced toast success
-    } catch (error: any) {
-      window.alert("Error deleting record: " + error.message); // Replaced toast error
-    } finally {
-      setIsDialogOpen(false);
-      setDeleteId(null);
-    }
-  };
-
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="ag-theme-quartz" style={{ height: 500, width: "100%" }}>
       <div className="mb-4 flex justify-end">
-        <Button onClick={exportToExcel} variant={"outline"}>
+        <Button onClick={exportToExcel} variant="outline">
           Download CSV
           <Download color="black" size={28} />
         </Button>
@@ -180,17 +156,8 @@ const StationInfoGrid = () => {
         domLayout="autoHeight"
         rowModelType="clientSide"
         onGridReady={onGridReady}
-        modules={[
-          ClientSideRowModelModule,
-          PaginationModule,
-          DateFilterModule,
-          TextFilterModule,
-          NumberFilterModule,
-          CsvExportModule,
-        ]}
       />
 
-      {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
@@ -198,8 +165,19 @@ const StationInfoGrid = () => {
         message="Are you sure you want to delete this service record?"
         title="Delete Confirmation"
       />
+
+{isViewModalOpen && selectedStation && (
+        <ViewServiceRecordModal
+          recordId={selectedStation._id ?? ""}
+          onClose={handleCloseViewModal} // Add a close handler
+        />
+      )}
     </div>
   );
 };
 
 export default StationInfoGrid;
+function setSelectedRecord(record: StationInfoInterface) {
+  throw new Error("Function not implemented.");
+}
+

@@ -30,7 +30,7 @@ export default function RootLayout({
         <div className="flex relative">
           <Sidebar /> {/* Sidebar on the left */}
           <Header/>
-          <main className="flex-1 p-4 transition-all duration-200 ml-[100px] md:ml-[100px] mt-[120px]">
+          <main className="flex-1 p-4 transition-all duration-200 ml-[100px] md:ml-[70px] mt-[120px]">
             {/* Add margin-top to offset header */}
             {children}
           </main>
