@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/Components/side-nav/side-nav";
-import Header from "@/Components/header/header";
+import Sidebar from "@/Components/header/side-nav";
+import { ToastContainer } from "react-toastify";
+import Footer from "@/Components/footer/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +30,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="flex relative">
           <Sidebar /> {/* Sidebar on the left */}
-          <Header/>
-          <main className="flex-1 p-4 transition-all duration-200 ml-[100px] md:ml-[70px] mt-[120px]">
+          <Footer/>
+          <ToastContainer />
+          <main className="flex-1 p-4 transition-all duration-300 ml-[0px] md:ml-[0px] mr-[0px] mt-[80px] mb-[-100px]">
             {/* Add margin-top to offset header */}
             {children}
           </main>

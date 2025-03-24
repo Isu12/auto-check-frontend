@@ -7,24 +7,47 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
+const validCountryCodes = [
+  { code: "+94", label: "(+94)" }
+];
+
+// Define the Zod schema for validation
 const businessFormSchema = object({
-  businessRegNo: string({ required_error: "Please enter Business Registration Number" }),
-  businessName: string({ required_error: "Please enter Business Name" }),
+  businessRegNo: string().min(1, { message: "Please enter Business Registration Number" }),
+  businessName: string().min(1, { message: "Please enter Business Name" }),
   branch: string().optional(),
-  address: string({ required_error: "Please enter Address" }),
-  city: string({ required_error: "Please enter City" }),
-  postalCode: string({ required_error: "Please enter Postal Code" }),
-  email: string({ required_error: "Please enter Email" }).email("Invalid email format"),
-  phoneNumber1: string({ required_error: "Please enter Primary Phone Number" }),
-  phoneNumber2: string().optional(),
-  ownerName: string({ required_error: "Please enter Owner Name" }),
-  contactNumber: string({ required_error: "Please enter Contact Number" }),
-  email2: string().min(1, "Please enter Email").email("Invalid email format"),
+  address: string().min(1, { message: "Please enter Address" }),
+  city: string().min(1, { message: "Please enter City" }),
+  postalCode: string()
+    .min(5, { message: "Postal Code must be 5 digits" })
+    .max(5, { message: "Postal Code must be 5 digits" })
+    .regex(/^\d{5}$/, { message: "Postal Code must be 5 digits" }),
+  email: string().min(1, { message: "Please enter Email" }).email("Invalid email format"),
+  phoneNumber1: string()
+    .optional()
+    .refine(value => !value || /^\d{10}$/.test(value), {
+      message: "Primary Phone Number must be 10 digits",
+    }),
+  phoneNumber2: string()
+    .optional()
+    .refine(value => !value || /^\d{10}$/.test(value), {
+      message: "Secondary Phone Number must be 10 digits",
+    }),
+  ownerName: string().min(1, { message: "Please enter Owner Name" }),
+  contactNumber: string()
+    .optional()
+    .refine(value => !value || /^\d{10}$/.test(value), {
+      message: "Contact Number must be 10 digits",
+    }),
+  email2: string().min(1, { message: "Please enter Email" }).email("Invalid email format"),
   webUrl: string().optional(),
 });
 
 const BusinessForm = () => {
   const [showModal, setShowModal] = useState(false);
+  const [countryCode1, setCountryCode1] = useState("+94"); // Default to Sri Lanka
+  const [countryCode2, setCountryCode2] = useState("+94"); // Default to Sri Lanka
+  const [countryCode3, setCountryCode3] = useState("+94"); // Default to Sri Lanka for contactNumber
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
@@ -36,7 +59,7 @@ const BusinessForm = () => {
       </Button>
 
       <Modal show={showModal} onHide={handleClose}>
-      <Modal.Header closeButton className="bg-dark text-white">
+        <Modal.Header closeButton className="bg-dark text-white">
           <Modal.Title>Business Details Form</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -61,7 +84,7 @@ const BusinessForm = () => {
               try {
                 const response = await axios.post("http://localhost:5555/api/stations", values);
                 console.log("Response:", response.data);
-                toast.success("Service record added successfully!");                
+                toast.success("Service record added successfully!");
                 handleClose();
               } catch (error: any) {
                 toast.error(`Error: ${error.message}`);
@@ -119,7 +142,26 @@ const BusinessForm = () => {
                     </div>
                     <div className="form-group col-md-6">
                       <label className="form-label">Primary Phone Number</label>
-                      <Field type="text" name="phoneNumber1" className="form-control" />
+                      <div className="d-flex">
+                        <select
+                          className="form-control"
+                          value={countryCode1}
+                          onChange={(e) => setCountryCode1(e.target.value)}
+                          disabled
+                        >
+                          {validCountryCodes.map((code) => (
+                            <option key={code.code} value={code.code}>
+                              {code.label}
+                            </option>
+                          ))}
+                        </select>
+                        <Field
+                          type="text"
+                          name="phoneNumber1"
+                          className="form-control ml-2"
+                          maxLength={10} // Changed to 10 digits
+                        />
+                      </div>
                       {errors.phoneNumber1 && <div className="text-danger">{errors.phoneNumber1}</div>}
                     </div>
                   </div>
@@ -127,7 +169,26 @@ const BusinessForm = () => {
                   <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Secondary Phone Number</label>
-                      <Field type="text" name="phoneNumber2" className="form-control" />
+                      <div className="d-flex">
+                        <select
+                          className="form-control"
+                          value={countryCode2}
+                          onChange={(e) => setCountryCode2(e.target.value)}
+                          disabled
+                        >
+                          {validCountryCodes.map((code) => (
+                            <option key={code.code} value={code.code}>
+                              {code.label}
+                            </option>
+                          ))}
+                        </select>
+                        <Field
+                          type="text"
+                          name="phoneNumber2"
+                          className="form-control ml-2"
+                          maxLength={10} // Changed to 10 digits
+                        />
+                      </div>
                     </div>
                     <div className="form-group col-md-6">
                       <label className="form-label">Owner Name</label>
@@ -139,7 +200,26 @@ const BusinessForm = () => {
                   <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Contact Number</label>
-                      <Field type="text" name="contactNumber" className="form-control" />
+                      <div className="d-flex">
+                        <select
+                          className="form-control"
+                          value={countryCode3}
+                          onChange={(e) => setCountryCode3(e.target.value)}
+                          disabled
+                        >
+                          {validCountryCodes.map((code) => (
+                            <option key={code.code} value={code.code}>
+                              {code.label}
+                            </option>
+                          ))}
+                        </select>
+                        <Field
+                          type="text"
+                          name="contactNumber"
+                          className="form-control ml-2"
+                          maxLength={10} // Changed to 10 digits
+                        />
+                      </div>
                       {errors.contactNumber && <div className="text-danger">{errors.contactNumber}</div>}
                     </div>
                     <div className="form-group col-md-6">

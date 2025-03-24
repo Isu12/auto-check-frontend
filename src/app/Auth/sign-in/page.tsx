@@ -55,7 +55,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-emerald-50 to-white p-4 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b  to-white p-4 dark:from-gray-900 dark:to-gray-800">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl">Sign in to your account</CardTitle>
@@ -63,7 +63,7 @@ export default function SignIn() {
             Don&apos;t have an account?{' '}
             <Link
               href="/auth/sign-up"
-              className="font-medium text-emerald-600 hover:text-emerald-500"
+              className="font-medium text-blue-900 hover:text-emerald-500"
             >
               Sign up
             </Link>
@@ -81,7 +81,7 @@ export default function SignIn() {
                   required
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  className="focus-visible:ring-emerald-500 focus-visible:ring-offset-0"
+                  className="focus-visible:ring-blue-900 focus-visible:ring-offset-0"
                   autoComplete="email"
                 />
               </div>
@@ -95,7 +95,7 @@ export default function SignIn() {
                     required
                     value={formData.password}
                     onChange={e => setFormData({ ...formData, password: e.target.value })}
-                    className="focus-visible:ring-emerald-500 focus-visible:ring-offset-0"
+                    className="focus-visible:ring-blue-900 focus-visible:ring-offset-0"
                     autoComplete="current-password"
                   />
                   <button
@@ -110,14 +110,11 @@ export default function SignIn() {
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="remember-me" />
-                <Label htmlFor="remember-me">Remember me</Label>
-              </div>
+
 
               <Link
                 href="/auth/forgot-password"
-                className="text-sm font-medium text-emerald-600 hover:text-emerald-500"
+                className="text-sm font-medium text-blue-900 hover:text-emerald-500"
               >
                 Forgot your password?
               </Link>
@@ -126,13 +123,13 @@ export default function SignIn() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-emerald-600 hover:bg-emerald-500"
+              className="w-full bg-blue-900 hover:bg-emerald-500"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
 
-          <SocialAuth />
+          
         </CardContent>
       </Card>
     </div>

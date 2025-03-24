@@ -1,6 +1,8 @@
 import ConfirmationDialog from "../../../Components/ConfirmationDialog";
 import { AgGridReact } from "ag-grid-react";
 import { useState, useEffect } from "react";
+import { GridReadyEvent } from "ag-grid-community"; // Import the correct type
+
 import {
   ColDef,
   ModuleRegistry,
@@ -13,10 +15,13 @@ import {
   GridApi,
 } from "ag-grid-community";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
-import { Download, Trash2, Eye } from "lucide-react"; // Added Eye icon for viewing
+import { Download, Trash2, Eye, Search } from "lucide-react"; // Added Eye icon for viewing
 import { Button } from "@/Components/ui/button";
 import Modal from "../Component/Modal";
 import ViewServiceRecordModal from "../Component/Modal";
+import { Input } from "@/Components/ui/input";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -37,6 +42,13 @@ const StationInfoGrid = () => {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedStation, setSelectedStation] = useState<StationInfoInterface | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredRowData = rowData.filter((record) =>
+    Object.values(record).some((value) =>
+      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   const onGridReady = (params: any) => {
     setGridApi(params.api);
@@ -75,9 +87,9 @@ const StationInfoGrid = () => {
       }
 
       setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
-      window.alert("Service Record Deleted");
+      toast.success("Service Record Deleted");
     } catch (error: any) {
-      window.alert("Error deleting record: " + error.message);
+      toast.error("Error deleting record: " + error.message);
     } finally {
       setIsDialogOpen(false);
       setDeleteId(null);
@@ -143,13 +155,23 @@ const StationInfoGrid = () => {
   return (
     <div className="ag-theme-quartz" style={{ height: 500, width: "100%" }}>
       <div className="mb-4 flex justify-end">
-        <Button onClick={exportToExcel} variant="outline">
+        <div className="relative w-full max-w-md mr-5">
+          <Search className="absolute right-4 mt-2 text-gray-400" size={18} />
+          <Input
+            className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:ring focus:ring-blue-200"
+            type="text"
+            placeholder="Search service stations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Button onClick={exportToExcel} variant={"outline"}>
           Download CSV
           <Download color="black" size={28} />
         </Button>
       </div>
       <AgGridReact
-        rowData={rowData}
+        rowData={filteredRowData}  // Now using the filtered data
         columnDefs={colDefs}
         pagination={true}
         paginationPageSize={10}
@@ -177,7 +199,4 @@ const StationInfoGrid = () => {
 };
 
 export default StationInfoGrid;
-function setSelectedRecord(record: StationInfoInterface) {
-  throw new Error("Function not implemented.");
-}
 
