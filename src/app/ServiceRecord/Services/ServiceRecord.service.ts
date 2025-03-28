@@ -12,6 +12,15 @@ export const fetchServiceRecords = async (): Promise<ServiceRecordInterface[]> =
   }
 };
 
+export const fetchServiceRecordById = async (id: string): Promise<ServiceRecordInterface> => {
+  try {
+    const response = await axios.get(`${BASE_URL}${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch service record by ID.");
+  }
+};
+
 export const createServiceRecord = async (record: ServiceRecordInterface): Promise<ServiceRecordInterface> => {
   try {
     const response = await axios.post(BASE_URL, record); // Accepts the full record object
@@ -21,14 +30,16 @@ export const createServiceRecord = async (record: ServiceRecordInterface): Promi
   }
 };
 
-export const updateServiceRecord = async (id: string, record: Partial<ServiceRecordInterface>): Promise<ServiceRecordInterface> => {
+export const updateServiceRecord = async (record: ServiceRecordInterface, updatedValues: { ServiceCost: number; }) => {
   try {
-    const response = await axios.put(`${BASE_URL}${id}`, record);
+    const response = await axios.put(`${BASE_URL}${record._id}`, record);
     return response.data;
   } catch (error) {
     throw new Error("Failed to update service record.");
   }
 };
+
+
 
 export const deleteServiceRecord = async (id: string): Promise<void> => {
   try {
@@ -37,3 +48,4 @@ export const deleteServiceRecord = async (id: string): Promise<void> => {
     throw new Error("Failed to delete service record.");
   }
 };
+

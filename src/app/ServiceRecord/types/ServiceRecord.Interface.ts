@@ -1,7 +1,7 @@
 export interface ServiceRecordInterface {
   _id?: string;
   OdometerReading: number;
-  DateOfService: string;
+  DateOfService: Date;
   ServiceType: string;
   DescriptionOfIssue: string;
   Diagnosis: string;
@@ -9,7 +9,9 @@ export interface ServiceRecordInterface {
   PartsUsed: string;
   ServiceCost: number;
   WarrantyInfo: string;
-  NextServiceDate: string;
+  NextServiceDate: Date;
   RecommendedServices: string;
+  InvoiceImageURL?: string;
   CreatedAt?: string;
+  
 }

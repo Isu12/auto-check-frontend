@@ -11,21 +11,21 @@ import {
   GridApi,
   CsvExportModule,
 } from "ag-grid-community";
-import { ServiceRecordInterface } from "../types/ServiceRecord.Interface";
+import { EchoTestInterface } from "../types/echo-test.interface";
 import { Trash2, Download, Search, Eye, Edit } from "lucide-react";
 import ConfirmationDialog from "../../../components/ConfirmationDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  fetchServiceRecords,
-  deleteServiceRecord,
-  updateServiceRecord
-} from "../../ServiceRecord/Services/ServiceRecord.service";
+  fetchEchoTestRecords,
+  deleteEchoTestRecord,
+  updateEchoTestRecord
+} from "../services/EchoTest.service";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
-import ViewServiceRecordModal from "./ServiceRecord";
-import EditServiceRecordModal from "./EditServiceRecordModal";
+import ViewEchoTestRecordModal from "./EchoTestRecord";
+import EditEchoTestModal from "./EditEchoTestModal";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -36,17 +36,17 @@ ModuleRegistry.registerModules([
   CsvExportModule,
 ]);
 
-const ServiceRecordGrid = () => {
-  const [rowData, setRowData] = useState<ServiceRecordInterface[]>([]);
+const EchoTestRecordGrid = () => {
+  const [rowData, setRowData] = useState<EchoTestInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editRecord, setEditRecord] = useState<ServiceRecordInterface | null>(null);
+  const [editRecord, setEditRecord] = useState<EchoTestInterface | null>(null);
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRecord, setSelectedRecord] = useState<ServiceRecordInterface | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<EchoTestInterface | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -64,88 +64,76 @@ const ServiceRecordGrid = () => {
     )
   );
 
-  const handleEditClick = (record: ServiceRecordInterface) => {
+  const handleEditClick = (record: EchoTestInterface) => {
     setEditRecord(record);
     setIsEditModalOpen(true);
   };
 
 
-  const handleViewClick = (record: ServiceRecordInterface) => {
+  const handleViewClick = (record: EchoTestInterface) => {
     setSelectedRecord(record);
-    setIsViewModalOpen(true); // This will trigger the modal open
+    setIsViewModalOpen(true); 
   };
 
   const handleCloseViewModal = () => {
-    setSelectedRecord(null); // Reset the record state when closing the modal
-    setIsViewModalOpen(false); // Close the modal
+    setSelectedRecord(null); 
+    setIsViewModalOpen(false); 
   };
 
-  const handleSaveEditedRecord = async (updatedRecord: ServiceRecordInterface) => {
+  const handleSaveEditedRecord = async (updatedRecord: EchoTestInterface) => {
     try {
-      // Create an updatedValues object with the fields you want to update
       const updatedValues = {
-        ServiceCost: updatedRecord.ServiceCost, // Example field you want to update
-        // You can add other fields here as necessary
+        IssuedDate: updatedRecord.IssuedDate,
+        ExpiryDate: updatedRecord.ExpiryDate,
+        TestingCenterName: updatedRecord.TestingCenterName,
+        TestingCenterBranch: updatedRecord.TestingCenterBranch,
       };
-  
-      // Call your API or service function to save the updated record
-      await updateServiceRecord(updatedRecord, updatedValues);
+      await updateEchoTestRecord(updatedRecord, updatedValues);
   
       setRowData((prevData) =>
         prevData.map((record) =>
           record._id === updatedRecord._id ? updatedRecord : record
         )
       );
-      toast.success("Service record updated successfully!");
+      toast.success("Echo Test record updated successfully!");
     } catch (error) {
-      toast.error("Error updating service record");
+      toast.error("Error updating echo test record");
     }
   };
   
 
 
   const [colDefs] = useState<ColDef[]>([
-    { field: "OdometerReading", headerName: "Odometer Reading", filter: "agNumberColumnFilter", valueFormatter: (params) => `${params.value} Km` },
+    { field: "TestID", headerName: "Test ID", filter: "agNumberColumnFilter", valueFormatter: (params) => `${params.value} Km` },
     {
-      field: "DateOfService",
-      headerName: "Date of Service",
+      field: "IssuedDate",
+      headerName: "Date of Issue",
       filter: "agDateColumnFilter",
       valueFormatter: (params) => {
         if (!params.value) return "";
         return new Date(params.value).toLocaleDateString();
       },
     },
-    { field: "ServiceType", headerName: "Service Type", filter: "agTextColumnFilter" },
-    { field: "DescriptionOfIssue", headerName: "Description of Issue", filter: "agTextColumnFilter" },
-    { field: "Diagnosis", headerName: "Diagnosis", filter: "agTextColumnFilter" },
-    { field: "ServiceDetails", headerName: "Service Details", filter: "agTextColumnFilter" },
-    { field: "PartsUsed", headerName: "Parts Used", filter: "agTextColumnFilter" },
     {
-      field: "ServiceCost",
-      headerName: "Service Cost",
-      filter: "agNumberColumnFilter",
-      valueFormatter: (params) => `Rs. ${params.value}`,
-    },
-    { field: "WarrantyInfo", headerName: "Warranty Info", filter: "agTextColumnFilter" },
-    {
-      field: "NextServiceDate",
-      headerName: "Next Service Date",
+      field: "ExpiryDate",
+      headerName: "Date of Expire",
       filter: "agDateColumnFilter",
       valueFormatter: (params) => {
         if (!params.value) return "";
         return new Date(params.value).toLocaleDateString();
       },
     },
-    { field: "RecommendedServices", headerName: "Recommended Services", filter: "agTextColumnFilter" },
+    { field: "TestingCenterName", headerName: "Testing Center Name", filter: "agTextColumnFilter" },
+    { field: "TestingCenterBranch", headerName: "Testing Center Branch", filter: "agTextColumnFilter" },
     {
-      field: "InvoiceImageURL",
-      headerName: "Invoice Image",
+      field: "CertificateFileURL",
+      headerName: "Test Certificate",
       cellRenderer: (params: { value: string }) => {
         if (!params.value) return "No Image";
         return (
           <img
             src={params.value}
-            alt="Invoice"
+            alt="Test Certificate"
             style={{
               width: "50px",
               height: "50px",
@@ -157,7 +145,7 @@ const ServiceRecordGrid = () => {
             onClick={() => window.open(params.value, "_blank")}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = "https://via.placeholder.com/50"; // Fallback image
+              target.src = "https://via.placeholder.com/50";
             }}
           />
         );
@@ -168,7 +156,7 @@ const ServiceRecordGrid = () => {
     {
       field: "actions",
       headerName: "Actions",
-      cellRenderer: (params: { data: ServiceRecordInterface }) => {
+      cellRenderer: (params: { data: EchoTestInterface }) => {
         return (
           <div style={{ display: "flex", gap: "10px" }} className="action-buttons">
             <button onClick={() => params.data._id && handleDeleteClick(params.data._id)}>
@@ -180,7 +168,7 @@ const ServiceRecordGrid = () => {
             </button>
 
             <button onClick={() => handleViewClick(params.data)}>
-              <Eye size={24} color="green" className="ml-3" /> {/* Added Eye icon */}
+              <Eye size={24} color="green" className="ml-3" />
             </button>
           </div>
         );
@@ -193,7 +181,7 @@ const ServiceRecordGrid = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchServiceRecords();
+        const data = await fetchEchoTestRecords();
         setRowData(data);
       } catch (error: any) {
         setError(error.message);
@@ -215,12 +203,12 @@ const ServiceRecordGrid = () => {
     if (!deleteId) return;
 
     try {
-      await deleteServiceRecord(deleteId);
+      await deleteEchoTestRecord(deleteId);
       // Remove the deleted record from state
       setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
-      toast.success("Service record deleted successfully!");
+      toast.success("Echo Test record deleted successfully!");
     } catch (error: any) {
-      toast.error("Error! Deleting the service record");
+      toast.error("Error! Deleting the echo test record");
     } finally {
       setIsDialogOpen(false);
       setDeleteId(null);
@@ -244,7 +232,7 @@ const ServiceRecordGrid = () => {
           <Input
             className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:ring focus:ring-blue-200"
             type="text"
-            placeholder="Search service records..."
+            placeholder="Search echo test reports..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -273,14 +261,14 @@ const ServiceRecordGrid = () => {
       />
 
       {isViewModalOpen && selectedRecord && (
-        <ViewServiceRecordModal
+        <ViewEchoTestRecordModal
           recordId={selectedRecord._id ?? ""}
-          onClose={handleCloseViewModal} // Add a close handler
+          onClose={handleCloseViewModal}
         />
       )}
 
       {isEditModalOpen && editRecord && (
-        <EditServiceRecordModal
+        <EditEchoTestModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           record={editRecord}
@@ -292,8 +280,7 @@ const ServiceRecordGrid = () => {
   );
 };
 
-export default ServiceRecordGrid;
-function saveServiceRecord(updatedRecord: ServiceRecordInterface) {
+export default EchoTestRecordGrid;
+function saveServiceRecord(updatedRecord: EchoTestInterface) {
   throw new Error("Function not implemented.");
 }
-

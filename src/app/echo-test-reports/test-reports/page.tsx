@@ -1,8 +1,8 @@
 "use client";
 
 import "bootstrap/dist/css/bootstrap.min.css";
-import ServiceRecordGrid from "../Components/ServiceRecordTable";
-import ServiceRecordForm from "../Components/ServiceRecordForm";
+import EchoTestRecordGrid from "../Components/EchoTestTable";
+import EchoTestForm from "../Components/EchoTestForm";
 import { useState } from "react";
 
 export default function Home() {
@@ -11,9 +11,9 @@ export default function Home() {
   return (
     <div>
 
-      <ServiceRecordForm />
+      <EchoTestForm />
 
-      <ServiceRecordGrid />
+      <EchoTestRecordGrid />
     </div>
   );
 }

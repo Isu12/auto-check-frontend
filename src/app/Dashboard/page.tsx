@@ -1,49 +1,21 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-
-const images = [
-  "/images/banner.jpg",
-  "/images/jeep.jpg",
-  "/images/BMW.jpg",
-  "/images/CAT.jpg",
-  "/images/Ducati.jpg",
-  "/images/Hilux.jpg",
-
-
-];
+import React from "react";
 
 const SearchSection = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000); // Change image every 5 seconds
-
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div
       style={{
         position: "relative",
-        width: "108.5%",
-        height: "800px",
-        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.3)), url(${images[currentImageIndex]})`,
+        width: "100%",
+        height: "600px",
+        backgroundImage: `url(${process.env.PUBLIC_URL}/images/image1.jpg), linear-gradient(to right, #000, #333)`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        transition: "background-image 1s ease-in-out",
-        left: "-100px",
-        right: "-300px",
-        marginTop: "-50px"
       }}
     >
-      {/* Dark Overlay */}
       <div
         style={{
           position: "absolute",
@@ -51,43 +23,38 @@ const SearchSection = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.4)",
         }}
       ></div>
 
-      {/* Content */}
       <div
         style={{
           position: "relative",
           textAlign: "center",
-          color: "white",
+          color: "white", 
           zIndex: 1,
-          padding: "20px",
         }}
       >
-        <h1 style={{ fontSize: "42px", marginBottom: "10px" }}>
-          Find Your Perfect Vehicle
-        </h1>
+        <h1>Find Your Perfect Vehicle</h1>
         <p
           style={{
             fontSize: "18px",
             lineHeight: "1.6",
-            color: "white",
+            color: "white", // Use white for visibility
             margin: "10px 0",
-            maxWidth: "800px",
           }}
         >
-          Discover vehicle history, service records, repairs, and modifications to make an informed decision on your next purchase.
+          Discover a wide range of vehicles suited to your needs. Compare prices,
+          features, and make an informed decision on your next purchase.
         </p>
 
-        {/* Search Bar */}
         <div
           style={{
             marginTop: "20px",
             display: "flex",
+            alignItems: "center",
             justifyContent: "center",
-            width: "100%",
-            maxWidth: "1000px",
+            width: "50%",
           }}
         >
           <div
@@ -98,7 +65,6 @@ const SearchSection = () => {
               borderRadius: "20px",
               padding: "5px 10px",
               width: "100%",
-              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
             }}
           >
             <input
@@ -122,8 +88,6 @@ const SearchSection = () => {
                 borderRadius: "20px",
                 cursor: "pointer",
                 marginLeft: "10px",
-                fontSize: "16px",
-                fontWeight: "bold",
               }}
             >
               Search
