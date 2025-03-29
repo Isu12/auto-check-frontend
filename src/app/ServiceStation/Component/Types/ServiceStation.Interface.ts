@@ -1,5 +1,5 @@
 export interface StationInfoInterface {
-    _id: string;
+    _id?: string;
     businessRegNo: string;
     businessName: string;
     branch: string;

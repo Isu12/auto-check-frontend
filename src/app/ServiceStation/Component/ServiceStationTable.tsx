@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ConfirmationDialog from "../../../Components/ConfirmationDialog";
 import { AgGridReact } from "ag-grid-react";
 import { useState, useEffect } from "react";
-import { GridReadyEvent } from "ag-grid-community"; // Import the correct type
 
 import {
   ColDef,
@@ -11,17 +11,16 @@ import {
   TextFilterModule,
   NumberFilterModule,
   DateFilterModule,
-  CsvExportModule,
   GridApi,
 } from "ag-grid-community";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
-import { Download, Trash2, Eye, Search } from "lucide-react"; // Added Eye icon for viewing
+import { Download, Trash2, Eye, Search, Edit } from "lucide-react"; // Added Eye icon for viewing
 import { Button } from "@/Components/ui/button";
-import Modal from "../Component/Modal";
 import ViewServiceRecordModal from "../Component/Modal";
 import { Input } from "@/Components/ui/input";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import EditModal from "./EditModal";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -41,8 +40,11 @@ const StationInfoGrid = () => {
 
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedStation, setSelectedStation] = useState<StationInfoInterface | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStation, setSelectedStation] =
+    useState<StationInfoInterface | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editRecord, setEditRecord] = useState<StationInfoInterface | null>(null);
 
   const filteredRowData = rowData.filter((record) =>
     Object.values(record).some((value) =>
@@ -62,31 +64,80 @@ const StationInfoGrid = () => {
     setSelectedStation(record); // Replace setSelectedRecord with setSelectedStation
     setIsViewModalOpen(true); // This will trigger the modal open
   };
-  
 
-  const handleCloseViewModal = () => {
-    setSelectedStation(null); // Reset to null instead of selectedRecord
-    setIsViewModalOpen(false); // Close the modal
-  };
-  
   const handleDeleteClick = (id: string) => {
     setDeleteId(id);
     setIsDialogOpen(true);
   };
 
+  const handleEditClick = (record: StationInfoInterface) => {
+    setEditRecord(record);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setSelectedStation(null); // Reset the record state when closing the modal
+    setIsViewModalOpen(false); // Close the modal
+  };
+  
+
+  const handleSaveEditedRecord = async (updatedRecord: StationInfoInterface) => {
+    try {
+      // Prepare the updated values to send in the API call
+      const updatedValues = { businessRegNo: updatedRecord.businessRegNo };
+  
+      // Make the API call to update the service record
+      const response = await fetch(
+        `http://localhost:5555/api/stations/${updatedRecord._id}`,
+        {
+          method: "PUT", // PUT method to update the record
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedValues), // Send the updated values as JSON
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error("Failed to update the service record");
+      }
+  
+      const updatedData = await response.json(); // Get the updated record from the response
+  
+      // Update the state with the new updated record
+      setRowData((prevData) =>
+        prevData.map((record) =>
+          record._id === updatedData._id ? updatedData : record
+        )
+      );
+  
+      // Show success toast
+      toast.success("Service record updated successfully!");
+    } catch (error: any) {
+      // Show error toast if the update fails
+      toast.error(`Error updating service record: ${error.message}`);
+    }
+  };
+  
+
   const handleConfirmDelete = async () => {
     if (!deleteId) return;
 
     try {
-      const response = await fetch(`http://localhost:5555/api/stations/${deleteId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:5555/api/stations/${deleteId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete service record");
       }
 
-      setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
+      setRowData((prevData) =>
+        prevData.filter((record) => record._id !== deleteId)
+      );
       toast.success("Service Record Deleted");
     } catch (error: any) {
       toast.error("Error deleting record: " + error.message);
@@ -97,27 +148,70 @@ const StationInfoGrid = () => {
   };
 
   const [colDefs] = useState<ColDef[]>([
-    { field: "businessRegNo", headerName: "Business Reg No", filter: "agTextColumnFilter" },
-    { field: "businessName", headerName: "Business Name", filter: "agTextColumnFilter" },
+    {
+      field: "businessRegNo",
+      headerName: "Business Reg No",
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "businessName",
+      headerName: "Business Name",
+      filter: "agTextColumnFilter",
+    },
     { field: "branch", headerName: "Branch", filter: "agTextColumnFilter" },
     { field: "address", headerName: "Address", filter: "agTextColumnFilter" },
     { field: "city", headerName: "City", filter: "agTextColumnFilter" },
-    { field: "postalCode", headerName: "Postal Code", filter: "agNumberColumnFilter" },
+    {
+      field: "postalCode",
+      headerName: "Postal Code",
+      filter: "agNumberColumnFilter",
+    },
     { field: "email", headerName: "Email", filter: "agTextColumnFilter" },
-    { field: "phoneNumber1", headerName: "Phone Number 1", filter: "agTextColumnFilter" },
-    { field: "phoneNumber2", headerName: "Phone Number 2", filter: "agTextColumnFilter" },
-    { field: "ownerName", headerName: "Owner Name", filter: "agTextColumnFilter" },
-    { field: "contactNumber", headerName: "Contact Number", filter: "agTextColumnFilter" },
-    { field: "email2", headerName: "Alternate Email", filter: "agTextColumnFilter" },
-    { field: "webUrl", headerName: "Website URL", filter: "agTextColumnFilter" },
+    {
+      field: "phoneNumber1",
+      headerName: "Phone Number 1",
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "phoneNumber2",
+      headerName: "Phone Number 2",
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "ownerName",
+      headerName: "Owner Name",
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "contactNumber",
+      headerName: "Contact Number",
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "email2",
+      headerName: "Alternate Email",
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "webUrl",
+      headerName: "Website URL",
+      filter: "agTextColumnFilter",
+    },
     {
       field: "actions",
       headerName: "Actions",
       cellRenderer: (params: { data: StationInfoInterface }) => {
         return (
-          <div style={{ display: "flex", gap: "10px" }} className="action-buttons">
+          <div
+            style={{ display: "flex", gap: "10px" }}
+            className="action-buttons"
+          >
             <button onClick={() => handleEyeClick(params.data)}>
-              <Eye size={24} color="green" className="ml-3" /> {/* Eye icon for viewing */}
+              <Eye size={24} color="green" className="ml-3" />{" "}
+              {/* Eye icon for viewing */}
+            </button>
+            <button onClick={() => handleEditClick(params.data)}>
+              <Edit size={24} color="navy" className="ml-3" />
             </button>
             <button onClick={() => handleDeleteClick(params.data._id ?? "")}>
               <Trash2 size={24} color="red" className="ml-3" />
@@ -171,7 +265,7 @@ const StationInfoGrid = () => {
         </Button>
       </div>
       <AgGridReact
-        rowData={filteredRowData}  // Now using the filtered data
+        rowData={filteredRowData} // Now using the filtered data
         columnDefs={colDefs}
         pagination={true}
         paginationPageSize={10}
@@ -188,10 +282,19 @@ const StationInfoGrid = () => {
         title="Delete Confirmation"
       />
 
-{isViewModalOpen && selectedStation && (
+      {isViewModalOpen && selectedStation && (
         <ViewServiceRecordModal
           recordId={selectedStation._id ?? ""}
           onClose={handleCloseViewModal} // Add a close handler
+        />
+      )}
+
+      {isEditModalOpen && editRecord && (
+        <EditModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          record={editRecord}
+          onSave={handleSaveEditedRecord}
         />
       )}
     </div>
@@ -199,4 +302,3 @@ const StationInfoGrid = () => {
 };
 
 export default StationInfoGrid;
-

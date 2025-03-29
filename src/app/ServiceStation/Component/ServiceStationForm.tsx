@@ -80,19 +80,18 @@ const BusinessForm = () => {
               webUrl: "",
             }}
             onSubmit={async (values) => {
-              console.log("Submitted values:", values);
               try {
                 const response = await axios.post("http://localhost:5555/api/stations", values);
                 console.log("Response:", response.data);
                 toast.success("Service record added successfully!");
                 handleClose();
-              } catch (error: any) {
-                toast.error(`Error: ${error.message}`);
+              } catch (error) {
+                toast.error(`Error: ${error}`);
               }
             }}
             validationSchema={toFormikValidationSchema(businessFormSchema)}
           >
-            {(formikProps: { errors: any; }) => {
+            {(formikProps) => {
               const errors = formikProps.errors;
               return (
                 <Form className="card-body">

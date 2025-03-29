@@ -1,19 +1,41 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
+
+const images = [
+  "/images/banner.jpg",
+  "/images/jeep.jpg",
+  "/images/BMW.jpg",
+  "/images/CAT.jpg",
+  "/images/Ducati.jpg",
+  "/images/Hilux.jpg",
+];
 
 const SearchSection = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 5000); // Change image every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div
       style={{
         position: "relative",
         width: "107.8%",
         height: "800px",
-        backgroundImage: "linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.3)), url('/images/banner.jpg')",
+        backgroundImage: `linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.3)), url(${images[currentImageIndex]})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        transition: "background-image 1s ease-in-out",
         left: "-100px",
         right: "-300px",
         marginTop: "-50px"
@@ -41,7 +63,9 @@ const SearchSection = () => {
           padding: "20px",
         }}
       >
-        <h1 style={{ fontSize: "42px", marginBottom: "10px" }}>Find Your Perfect Vehicle</h1>
+        <h1 style={{ fontSize: "42px", marginBottom: "10px" }}>
+          Find Your Perfect Vehicle
+        </h1>
         <p
           style={{
             fontSize: "18px",
@@ -108,4 +132,5 @@ const SearchSection = () => {
     </div>
   );
 };
+
 export default SearchSection;
