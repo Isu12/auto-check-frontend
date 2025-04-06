@@ -104,7 +104,7 @@ const EchoTestRecordGrid = () => {
 
 
   const [colDefs] = useState<ColDef[]>([
-    { field: "TestID", headerName: "Test ID", filter: "agNumberColumnFilter", valueFormatter: (params) => `${params.value} Km` },
+    { field: "TestID", headerName: "Test ID", filter: "agNumberColumnFilter", valueFormatter: (params) => `${params.value}` },
     {
       field: "IssuedDate",
       headerName: "Date of Issue",
@@ -160,15 +160,15 @@ const EchoTestRecordGrid = () => {
         return (
           <div style={{ display: "flex", gap: "10px" }} className="action-buttons">
             <button onClick={() => params.data._id && handleDeleteClick(params.data._id)}>
-              <Trash2 size={24} color="red" className="ml-3" />
+              <Trash2 size={20} color="red" className="ml-3" />
             </button>
 
             <button onClick={() => handleEditClick(params.data)}>
-              <Edit size={24} color="navy" className="ml-3" />
+              <Edit size={20} color="navy" className="ml-3" />
             </button>
 
             <button onClick={() => handleViewClick(params.data)}>
-              <Eye size={24} color="green" className="ml-3" />
+              <Eye size={20} color="green" className="ml-3" />
             </button>
           </div>
         );
