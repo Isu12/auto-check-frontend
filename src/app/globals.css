@@ -9,6 +9,8 @@
 
 :root {
   --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -38,8 +40,6 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
 }
 
 .dark {
@@ -118,11 +118,9 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground;
   }
-
   /* Base font configuration */
   body {
     font-family:
@@ -181,55 +179,10 @@
   filter: invert(1);
 }
 
-.icon-view {
-  display: "flex";
-  align-items: "center";
-  gap: "5px";
+.ag-root-wrapper {
+  margin-left: 3rem; /* Adjust as needed */
 }
 
-/* Modal overlay */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-/* Modal actions */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
 
-/* Layout.module.css */
-.layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Full viewport height */
-}
 
-.main {
-  flex: 1; /* Takes all available space */
-  padding-bottom: 2rem; /* Add some space above footer */
-}
-
-.no-underline {
-  text-decoration: none !important;
-}
-.no-underline:hover {
-  text-decoration: none !important;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: none;
-}
