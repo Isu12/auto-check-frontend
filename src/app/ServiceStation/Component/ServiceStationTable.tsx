@@ -12,9 +12,11 @@ import {
   NumberFilterModule,
   DateFilterModule,
   GridApi,
+  CsvExportModule, 
+
 } from "ag-grid-community";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
-import { Download, Trash2, Eye, Search, Edit } from "lucide-react"; // Added Eye icon for viewing
+import { Download, Trash2, Eye, Search, Edit } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import ViewServiceRecordModal from "../Component/Modal";
 import { Input } from "@/Components/ui/input";
@@ -28,6 +30,7 @@ ModuleRegistry.registerModules([
   TextFilterModule,
   NumberFilterModule,
   DateFilterModule,
+  CsvExportModule,
 ]);
 
 const StationInfoGrid = () => {
@@ -88,7 +91,7 @@ const StationInfoGrid = () => {
   
       // Make the API call to update the service record
       const response = await fetch(
-        `http://localhost:5555/api/stations/${updatedRecord._id}`,
+        `http://localhost:5000/api/stations/${updatedRecord._id}`,
         {
           method: "PUT", // PUT method to update the record
           headers: {
@@ -195,6 +198,11 @@ const StationInfoGrid = () => {
     {
       field: "webUrl",
       headerName: "Website URL",
+      filter: "agTextColumnFilter",
+    },
+    {
+      field: "businessType",
+      headerName: "Business Type",
       filter: "agTextColumnFilter",
     },
     {

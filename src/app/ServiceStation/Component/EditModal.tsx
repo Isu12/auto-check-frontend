@@ -1,9 +1,21 @@
+"use client";
+
+// EditModal.tsx
 import React, { useState, useEffect } from "react";
 import { Button } from "../../../Components/ui/button";
 import { Input } from "../../../Components/ui/input";
 import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
+
+const businessTypes = [
+  "Service Station",
+  "Vehicle Repair Center",
+  "Auto Electrical Service",
+  "Tire Service Center",
+  "Car Wash",
+  "Other"
+];
 
 interface EditServiceStationModalProps {
   isOpen: boolean;
@@ -27,7 +39,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
   }, [isOpen, record]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     field: keyof StationInfoInterface
   ) => {
     if (editedStation) {
@@ -42,7 +54,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
     if (editedStation) {
       try {
         const response = await axios.put(
-          `http://localhost:5555/api/stations/${editedStation._id}`,
+          `http://localhost:5000/api/stations/${editedStation._id}`,
           editedStation
         );
         const updatedStation = response.data;
@@ -57,7 +69,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
   if (!isOpen || !editedStation) return null;
 
   return (
-    <Modal show={isOpen} onHide={onClose}>
+    <Modal show={isOpen} onHide={onClose} size="lg">
       <Modal.Header closeButton className="bg-dark text-white">
         <Modal.Title>Edit Business Record</Modal.Title>
       </Modal.Header>
@@ -85,19 +97,36 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
             />
           </div>
 
+          {/* Business Type */}
+          <div className="form-group col-md-6">
+            <label className="form-label">Business Type</label>
+            <select
+              value={editedStation.businessType}
+              onChange={(e) => handleInputChange(e, "businessType")}
+              className="form-control"
+            >
+              <option value="">Select Business Type</option>
+              {businessTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Branch */}
           <div className="form-group col-md-6">
-            <label className="form-label">Branch</label>
+            <label className="form-label">Branch (Optional)</label>
             <Input
               type="text"
-              value={editedStation.branch}
+              value={editedStation.branch || ""}
               onChange={(e) => handleInputChange(e, "branch")}
               className="form-control"
             />
           </div>
 
           {/* Address */}
-          <div className="form-group col-md-6">
+          <div className="form-group col-12">
             <label className="form-label">Address</label>
             <Input
               type="text"
@@ -108,7 +137,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
           </div>
 
           {/* City */}
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-4">
             <label className="form-label">City</label>
             <Input
               type="text"
@@ -119,7 +148,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
           </div>
 
           {/* Postal Code */}
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-4">
             <label className="form-label">Postal Code</label>
             <Input
               type="text"
@@ -130,7 +159,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
           </div>
 
           {/* Email */}
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-4">
             <label className="form-label">Email</label>
             <Input
               type="email"
@@ -140,9 +169,9 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
             />
           </div>
 
-          {/* Phone Number 1 */}
+          {/* Primary Phone Number */}
           <div className="form-group col-md-6">
-            <label className="form-label">Phone Number 1</label>
+            <label className="form-label">Primary Phone Number</label>
             <Input
               type="text"
               value={editedStation.phoneNumber1}
@@ -151,12 +180,12 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
             />
           </div>
 
-          {/* Phone Number 2 */}
+          {/* Secondary Phone Number (Optional) */}
           <div className="form-group col-md-6">
-            <label className="form-label">Phone Number 2</label>
+            <label className="form-label">Secondary Phone Number (Optional)</label>
             <Input
               type="text"
-              value={editedStation.phoneNumber2}
+              value={editedStation.phoneNumber2 || ""}
               onChange={(e) => handleInputChange(e, "phoneNumber2")}
               className="form-control"
             />
@@ -184,25 +213,26 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
             />
           </div>
 
-          {/* Alternate Email */}
+          {/* Secondary Email (Optional) */}
           <div className="form-group col-md-6">
-            <label className="form-label">Alternate Email</label>
+            <label className="form-label">Secondary Email (Optional)</label>
             <Input
               type="email"
-              value={editedStation.email2}
+              value={editedStation.email2 || ""}
               onChange={(e) => handleInputChange(e, "email2")}
               className="form-control"
             />
           </div>
 
-          {/* Website URL */}
+          {/* Website URL (Optional) */}
           <div className="form-group col-md-6">
-            <label className="form-label">Website URL</label>
+            <label className="form-label">Website URL (Optional)</label>
             <Input
-              type="text"
-              value={editedStation.webUrl}
+              type="url"
+              value={editedStation.webUrl || ""}
               onChange={(e) => handleInputChange(e, "webUrl")}
               className="form-control"
+              placeholder="https://example.com"
             />
           </div>
         </div>

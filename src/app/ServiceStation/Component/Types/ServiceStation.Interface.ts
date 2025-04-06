@@ -1,4 +1,5 @@
 export interface StationInfoInterface {
+    businessType: string | number | readonly string[] | undefined;
     _id?: string;
     businessRegNo: string;
     businessName: string;

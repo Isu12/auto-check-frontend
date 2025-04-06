@@ -79,7 +79,7 @@ const Navbar = () => {
 
           {isProfileOpen && (
             <ul className="absolute right-0 mt-2 w-48 bg-white text-blue-900 rounded-lg shadow-lg">
-              <li className="hover:bg-blue-300 px-4 py-2 transition-all"><Link href="/profile">Profile</Link></li>
+              <li className="hover:bg-blue-300 px-4 py-2 transition-all"><Link href="/profile">Log-in</Link></li>
               <li className="hover:bg-blue-300 px-4 py-2 transition-all"><Link href="/settings">Settings</Link></li>
               <li className="hover:bg-red-400 text-red-700 px-4 py-2 transition-all"><button>Logout</button></li>
             </ul>

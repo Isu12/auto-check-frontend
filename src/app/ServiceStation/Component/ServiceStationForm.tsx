@@ -1,3 +1,4 @@
+// ServiceStationForm.tsx
 import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { Formik, Field, Form } from "formik";
@@ -11,10 +12,20 @@ const validCountryCodes = [
   { code: "+94", label: "(+94)" }
 ];
 
+const businessTypes = [
+  "Service Station",
+  "Vehicle Repair Center",
+  "Auto Electrical Service",
+  "Tire Service Center",
+  "Car Wash",
+  "Other"
+];
+
 // Define the Zod schema for validation
 const businessFormSchema = object({
   businessRegNo: string().min(1, { message: "Please enter Business Registration Number" }),
   businessName: string().min(1, { message: "Please enter Business Name" }),
+  businessType: string().min(1, { message: "Please select Business Type" }),
   branch: string().optional(),
   address: string().min(1, { message: "Please enter Address" }),
   city: string().min(1, { message: "Please enter City" }),
@@ -67,6 +78,7 @@ const BusinessForm = () => {
             initialValues={{
               businessRegNo: "",
               businessName: "",
+              businessType: "",
               branch: "",
               address: "",
               city: "",
@@ -81,7 +93,7 @@ const BusinessForm = () => {
             }}
             onSubmit={async (values) => {
               try {
-                const response = await axios.post("http://localhost:5555/api/stations", values);
+                const response = await axios.post("http://localhost:5000/api/stations", values);
                 console.log("Response:", response.data);
                 toast.success("Service record added successfully!");
                 handleClose();
@@ -110,35 +122,50 @@ const BusinessForm = () => {
 
                   <div className="row">
                     <div className="form-group col-md-6">
+                      <label className="form-label">Business Type</label>
+                      <Field as="select" name="businessType" className="form-control">
+                        <option value="">Select Business Type</option>
+                        {businessTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </Field>
+                      {errors.businessType && <div className="text-danger">{errors.businessType}</div>}
+                    </div>
+                    <div className="form-group col-md-6">
                       <label className="form-label">Branch</label>
                       <Field type="text" name="branch" className="form-control" />
                     </div>
+                  </div>
+
+                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Address</label>
                       <Field type="text" name="address" className="form-control" />
                       {errors.address && <div className="text-danger">{errors.address}</div>}
                     </div>
-                  </div>
-
-                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">City</label>
                       <Field type="text" name="city" className="form-control" />
                       {errors.city && <div className="text-danger">{errors.city}</div>}
                     </div>
+                  </div>
+
+                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Postal Code</label>
                       <Field type="text" name="postalCode" className="form-control" />
                       {errors.postalCode && <div className="text-danger">{errors.postalCode}</div>}
                     </div>
-                  </div>
-
-                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Email</label>
                       <Field type="email" name="email" className="form-control" />
                       {errors.email && <div className="text-danger">{errors.email}</div>}
                     </div>
+                  </div>
+
+                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Primary Phone Number</label>
                       <div className="d-flex">
@@ -163,9 +190,6 @@ const BusinessForm = () => {
                       </div>
                       {errors.phoneNumber1 && <div className="text-danger">{errors.phoneNumber1}</div>}
                     </div>
-                  </div>
-
-                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Secondary Phone Number</label>
                       <div className="d-flex">
@@ -189,14 +213,14 @@ const BusinessForm = () => {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Owner Name</label>
                       <Field type="text" name="ownerName" className="form-control" />
                       {errors.ownerName && <div className="text-danger">{errors.ownerName}</div>}
                     </div>
-                  </div>
-
-                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Contact Number</label>
                       <div className="d-flex">
@@ -221,15 +245,17 @@ const BusinessForm = () => {
                       </div>
                       {errors.contactNumber && <div className="text-danger">{errors.contactNumber}</div>}
                     </div>
+                  </div>
+
+                  <div className="row">
                     <div className="form-group col-md-6">
                       <label className="form-label">Alternate Email</label>
                       <Field type="email" name="email2" className="form-control" />
                     </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Website URL</label>
-                    <Field type="text" name="webUrl" className="form-control" />
+                    <div className="form-group col-md-6">
+                      <label className="form-label">Website URL</label>
+                      <Field type="text" name="webUrl" className="form-control" />
+                    </div>
                   </div>
 
                   <div className="card-actions justify-content-end mt-4">

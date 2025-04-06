@@ -20,7 +20,7 @@ const ViewServiceRecordModal: React.FC<ViewServiceRecordModalProps> = ({ recordI
     const fetchServiceRecord = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5555/api/stations/${recordId}`, {
+        const response = await axios.get(`http://localhost:5000/api/stations/${recordId}`, {
           signal: controller.signal,
         });
         setServiceRecord(response.data);
@@ -54,6 +54,7 @@ const ViewServiceRecordModal: React.FC<ViewServiceRecordModalProps> = ({ recordI
             <Table striped bordered hover responsive className="mt-3">
               <tbody>
                 <tr><td><strong>🏢 Business Registration No:</strong></td><td>{serviceRecord.businessRegNo}</td></tr>
+                <tr><td><strong>🏢 Business Type:</strong></td><td>{serviceRecord.businessType}</td></tr>
                 <tr><td><strong>🏢 Business Name:</strong></td><td>{serviceRecord.businessName}</td></tr>
                 <tr><td><strong>🏢 Branch:</strong></td><td>{serviceRecord.branch}</td></tr>
                 <tr><td><strong>🏠 Address:</strong></td><td>{serviceRecord.address}</td></tr>
