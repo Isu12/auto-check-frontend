@@ -11,8 +11,7 @@
   text-align: center;
   font-family: 'Arial', sans-serif;
   width: 100%;
-  position: absolute;
-  margin-top: auto;
+  position: absolute; /* Changed to absolute to make the footer stick at the bottom */
   bottom: -349px;
   left: 0px;
   right: 0px;
