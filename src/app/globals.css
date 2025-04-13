@@ -1,7 +1,5 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
-
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -123,5 +121,64 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Base font configuration */
+  body {
+    font-family:
+      'Poppins',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      Arial,
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Dark mode transitions */
+  @media (prefers-color-scheme: dark) {
+    body {
+      color-scheme: dark;
+    }
+  }
+
+  /* Responsive breakpoints adjustments */
+  @media (max-width: 640px) {
+    html {
+      font-size: 14px;
+    }
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better text selection */
+  ::selection {
+    @apply bg-emerald-500/20;
+  }
+
+  /* Autofill styles */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: hsl(var(--foreground));
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--background)) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  .sidebar-expanded {
+    width: 15rem;
+  }
 }
 
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
+.ag-root-wrapper {
+  margin-left: 3rem; /* Adjust as needed */
+}

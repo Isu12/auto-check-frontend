@@ -1,49 +1,47 @@
-/* side-nav.module.css */
-
 /* General styles */
 .sidebar {
   position: fixed;
-  top: 0;
+  top: 78px;
   left: 0;
   height: 100%;
-  width: 100px; /* Default partially open width */
-  background-color: #470e00; /* Light Orange */
-  color: #fef9e4; /* Light Yellow */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  width: 80px; /* Default thinner width */
+  background-color: #205781;
+  color: #fef9e4;
   transition: transform 0.3s ease-in-out, width 0.3s ease;
   transform: translateX(0);
+  z-index: 20;
 }
 
 .sidebar.open {
-  width: 250px; /* Full width when opened */
+  width: 200px; /* Slimmer expanded width */
 }
 
 .sidebar.closed {
-  width: 120px; /* Partial width when closed */
+  width: 60px; /* More compact when closed */
 }
 
 .sidebarToggle {
   position: absolute;
-  top: 20px;
-  right: -30px; /* Adjust based on your sidebar width */
-  background-color: #b15200; /* Darker Orange */
-  color: #fef9e4; /* Light Yellow */
+  top: 15px;
+  right: -35px;
+  background-color: #4F959D;
+  color: #fef9e4;
   border: none;
-  padding: 10px;
+  padding: 8px;
   cursor: pointer;
   border-radius: 50%;
-  font-size: 20px;
+  font-size: 16px;
   transition: all 0.3s ease;
 }
 
 .sidebarToggle:hover {
-  background-color: #d35400; /* Even darker orange */
+  background-color: #157a8b;
 }
 
 .sidebarNav {
   display: flex;
   flex-direction: column;
-  padding-top: 60px;
+  padding-top: 10px;
 }
 
 .sidebarNav ul {
@@ -52,45 +50,54 @@
 }
 
 .sidebarNav li {
-  margin: 20px 0;
+  margin: 12px 0;
 }
 
 .sidebarItem {
   text-decoration: none;
-  color: #fef9e4; /* Light Yellow */
-  font-size: 18px;
+  color: #fef9e4;
+  font-size: 14px; /* Adjusted for compact layout */
   display: flex;
   align-items: center;
-  padding: 10px 20px;
+  padding: 6px 12px;
   border-radius: 5px;
   transition: background-color 0.3s ease;
 }
 
 .sidebarItem:hover {
-  background-color: #a52b1b; /* Darker Orange */
+  background-color: #034C53;
 }
 
 .sidebarItem .icon {
-  margin-right: 10px;
-  font-size: 20px;
+  margin-right: 6px;
+  font-size: 20px; /* Decreased from 28px */
 }
 
 .itemName {
   display: inline-block;
-  margin-left: 10px;
+  margin-left: 6px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .sidebar {
-    width: 100px; /* Reduce width on small screens */
+      width: 25px;
+  }
+
+  .sidebar.open {
+      width: 150px;
   }
 
   .sidebarItem {
-    font-size: 16px;
+      font-size: 12px;
+      padding: 5px 10px;
   }
 
   .sidebarToggle {
-    top: 15px;
-    right: -45px;
+      top: 12px;
+      right: -38px;
+  }
+
+  .sidebarItem .icon {
+      font-size: 10px; /* Slightly smaller for mobile */
   }
 }

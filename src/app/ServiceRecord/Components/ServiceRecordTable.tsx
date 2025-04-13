@@ -22,7 +22,6 @@ ModuleRegistry.registerModules([
 ]);
 
 
-
 const ServiceRecordGrid = () => {
   const [rowData, setRowData] = useState<ServiceRecordInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
