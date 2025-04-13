@@ -44,3 +44,4 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> =({
     </AlertDialog>
   )
 }
+export default ConfirmationDialog;

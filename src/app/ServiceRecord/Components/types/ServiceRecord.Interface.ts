@@ -1,4 +1,5 @@
 export interface ServiceRecordInterface {
+  _id: string;
   OdometerReading: number;
   DateOfService: string;
   ServiceType: string;
