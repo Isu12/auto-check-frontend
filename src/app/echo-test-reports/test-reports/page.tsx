@@ -11,9 +11,12 @@ export default function Home() {
   return (
     <div>
 
-      <EchoTestForm />
-
+      <EchoTestForm showModal={false} handleClose={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
+<div className="b-20">
       <EchoTestRecordGrid />
+      </div>
     </div>
   );
 }

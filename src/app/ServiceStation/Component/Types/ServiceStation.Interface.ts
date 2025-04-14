@@ -1,18 +1,21 @@
 export interface StationInfoInterface {
-    businessType: string | number | readonly string[] | undefined;
-    _id?: string;
-    businessRegNo: string;
-    businessName: string;
-    branch: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    email: string;
-    phoneNumber1: string;
-    phoneNumber2: string;
-    ownerName: string;
-    contactNumber: string;
-    email2: string;
-    webUrl: string;
-  }
-  
+  _id?: string;
+  user: string;
+  name: string; // Business Name
+  type: string; // Business Type
+  registrationNumber: string; // Business Registration Number
+  email: string;
+  contactDetails: string;
+  website: string;
+  branches: BranchInterface[];
+}
+
+interface BranchInterface {
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  contactDetails: string;
+  servicesOffered?: string[]; // Optional for Service Centers
+  createdAt?: Date; // Added during submission
+}

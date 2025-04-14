@@ -6,7 +6,7 @@ import { Modal } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { updateServiceRecord } from "../Services/ServiceRecord.service";
-
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 interface EditServiceRecordModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +21,7 @@ const EditServiceRecordModal: React.FC<EditServiceRecordModalProps> = ({
   onSave,
 }) => {
   const [editedRecord, setEditedRecord] = useState<ServiceRecordInterface | null>(null);
+  const accessToken = useAuthToken();
 
   // Set the edited record when the modal opens
   useEffect(() => {
@@ -53,13 +54,15 @@ const EditServiceRecordModal: React.FC<EditServiceRecordModalProps> = ({
   };
 
   const handleSave = async () => {
+    if (!accessToken) return;
+
     if (editedRecord) {
       const updatedValues = {
         ServiceCost: editedRecord.ServiceCost,  // For example, you might want to only send a few fields.
       };
   
       try {
-        await updateServiceRecord(editedRecord, updatedValues);
+        await updateServiceRecord(editedRecord, updatedValues, accessToken);
         onSave(editedRecord);
         onClose();
       } catch (error) {

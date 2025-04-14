@@ -2,40 +2,39 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Spinner, Table, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
+import { fetchServiceStationById } from "../services/api";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 
 interface ViewServiceRecordModalProps {
   recordId: string | null;
   onClose: () => void;
 }
 
-const ViewServiceRecordModal: React.FC<ViewServiceRecordModalProps> = ({ recordId, onClose }) => {  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ViewServiceRecordModal: React.FC<ViewServiceRecordModalProps> = ({ recordId, onClose }) => {
   const [serviceRecord, setServiceRecord] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  
-  useEffect(() => {
-    if (!recordId) return;
+  const [error, setError] = useState<string | null>(null);
+  const accessToken = useAuthToken();
 
-    const controller = new AbortController();
-    const fetchServiceRecord = async () => {
+  useEffect(() => {
+    const fetchUserStation = async () => {
+      if (!recordId || !accessToken) return;
+
       setLoading(true);
+      setError(null);
+
       try {
-        const response = await axios.get(`http://localhost:5000/api/stations/${recordId}`, {
-          signal: controller.signal,
-        });
-        setServiceRecord(response.data);
-      } catch (error) {
-        if (!axios.isCancel(error)) {
-          toast.error("Error fetching service record.");
-        }
+        const data = await fetchServiceStationById(recordId, accessToken);
+        setServiceRecord(data);
+      } catch (error: any) {
+        setError(error.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchServiceRecord();
-    return () => controller.abort(); // Cleanup request on unmount
-  }, [recordId]);
+    fetchUserStation();
+  }, [recordId, accessToken]);
 
   return (
     <Modal show={!!recordId} onHide={onClose} size="lg" centered>
@@ -48,6 +47,8 @@ const ViewServiceRecordModal: React.FC<ViewServiceRecordModalProps> = ({ recordI
             <Spinner animation="border" variant="primary" />
             <p className="mt-3">Fetching business information...</p>
           </div>
+        ) : error ? (
+          <Alert variant="danger">❌ {error}</Alert>
         ) : serviceRecord ? (
           <div className="border rounded p-3 bg-light shadow-sm">
             <h5 className="text-primary">🔧 Business Information</h5>

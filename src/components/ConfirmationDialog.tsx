@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../Components/ui/button";
+import { Button } from "../app/auth/ui/button";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
   AlertDialogDescription,
-} from "@/Components/ui/alert-dialog"; 
+} from "../app/auth/ui/alert-dialog"; 
 
 
 type ConfirmationDialogProps = {

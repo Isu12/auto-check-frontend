@@ -2,7 +2,6 @@
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import InsuranceClaimGrid from "../Components/InsuranceClaimTable";
-import InsuranceClaimForm from "../Components/InsuranceClaimForm";
 import { useState } from "react";
 
 export default function Home() {
@@ -11,7 +10,6 @@ export default function Home() {
   return (
     <div>
 
-      <InsuranceClaimForm />
 
       <InsuranceClaimGrid />
     </div>

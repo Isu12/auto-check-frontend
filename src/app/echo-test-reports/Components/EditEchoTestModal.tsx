@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "../../auth/ui/button";
+import { Input } from "../../auth/ui/input";
 import { EchoTestInterface } from "../types/echo-test.interface";
 import { Modal } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { updateEchoTestRecord } from "../services/EchoTest.service";
-
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 interface EditEchoTestModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +21,7 @@ const EditEchoTestModal: React.FC<EditEchoTestModalProps> = ({
   onSave,
 }) => {
   const [editedRecord, setEditedRecord] = useState<EchoTestInterface | null>(null);
+  const accessToken = useAuthToken();
 
   useEffect(() => {
     if (isOpen && record) {
@@ -50,6 +51,7 @@ const EditEchoTestModal: React.FC<EditEchoTestModalProps> = ({
   };
 
   const handleSave = async () => {
+    if (!accessToken) return;
     if (editedRecord && editedRecord._id) {
       try {
         const updatedValues = {
@@ -64,7 +66,7 @@ const EditEchoTestModal: React.FC<EditEchoTestModalProps> = ({
           Object.entries(updatedValues).filter(([_, v]) => v !== undefined)
         );
 
-        await updateEchoTestRecord(editedRecord, filteredValues);
+        await updateEchoTestRecord(editedRecord, filteredValues, accessToken);
         onSave(editedRecord);
         onClose();
       } catch (error) {

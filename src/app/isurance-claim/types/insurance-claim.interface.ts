@@ -1,4 +1,7 @@
+import { VehicleInterface } from "@/app/dashboard/types/vehicle.interface";
+
 export interface InsuranceClaimInterface {
+  vehicle?: VehicleInterface; 
   _id?: string;
   InsuranceID?: string;
   ClaimDate?: Date;

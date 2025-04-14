@@ -1,106 +1,45 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Button } from "@/Components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
-import { toast } from "react-toastify";
+import { Card, CardContent, CardHeader, CardTitle } from "../../auth/ui/card"
 import "react-toastify/dist/ReactToastify.css";
-import ConfirmationDialog from "../../../Components/ConfirmationDialog";
-import EditModal from "./EditModal";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
+import { fetchServiceStationById } from "../services/api";
 
-const StationInfoCardView = () => {
+
+interface ViewStationModalProps {
+  recordId: string;
+  onClose: () => void;
+}
+
+const StationInfoCardView = ({ recordId, onClose }: ViewStationModalProps) => {
   const [stationData, setStationData] = useState<StationInfoInterface | null>(
     null
   );
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const accessToken = useAuthToken();
+
 
   useEffect(() => {
     const fetchUserStation = async () => {
       try {
-        // Replace with your actual API endpoint to get logged-in user's station
-        const response = await fetch(
-          "http://localhost:5555/api/stations/my-station",
-          {
-            credentials: "include", // Include cookies for authentication
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch station data");
-        }
-
-        const data = await response.json();
+        if (!accessToken) throw new Error("No access token found");
+  
+        const data = await fetchServiceStationById(recordId,accessToken);
         setStationData(data);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchUserStation();
-  }, []);
-
-  const handleDelete = async () => {
-    if (!stationData?._id) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:5555/api/stations/${stationData._id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete service station");
-      }
-
-      setStationData(null);
-      toast.success("Service Station Deleted");
-    } catch (error) {
-      toast.error("Error deleting station: " + error);
-    } finally {
-      setIsDialogOpen(false);
-    }
-  };
-
-  const handleSaveEditedRecord = async (
-    updatedRecord: StationInfoInterface
-  ) => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/stations/${updatedRecord._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(updatedRecord),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update the service station");
-      }
-
-      const updatedData = await response.json();
-      setStationData(updatedData);
-      toast.success("Service station updated successfully!");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(`Error updating service station: ${error.message}`);
-    }
-  };
-
+  }, [accessToken]);
+  // Dependency on accessToken to re-fetch when token changes
+  
   if (loading)
     return <div className="p-4">Loading your station details...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
@@ -110,18 +49,9 @@ const StationInfoCardView = () => {
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">My Service Station</h1>
-        <div className="space-x-2">
-          <Button variant="outline" onClick={() => setIsEditModalOpen(true)}>
-            <Edit className="mr-2 h-4 w-4" /> Edit
-          </Button>
-          <Button variant="destructive" onClick={() => setIsDialogOpen(true)}>
-            <Trash2 className="mr-2 h-4 w-4" /> Delete
-          </Button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Basic Information Card */}
         <Card>
           <CardHeader>
             <CardTitle>Basic Information</CardTitle>
@@ -215,22 +145,6 @@ const StationInfoCardView = () => {
         </Card>
       </div>
 
-      <ConfirmationDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onConfirm={handleDelete}
-        message="Are you sure you want to delete your service station? This action cannot be undone."
-        title="Delete Confirmation"
-      />
-
-      {isEditModalOpen && stationData && (
-        <EditModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          record={stationData}
-          onSave={handleSaveEditedRecord}
-        />
-      )}
     </div>
   );
 };
