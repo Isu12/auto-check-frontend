@@ -7,7 +7,7 @@ import { createModificationRequest } from "../../ModificationRequest/Modificatio
 import { ModificationRequestInterface } from "../Types/ModificationRequest.Interface";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import axios from "axios";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dtu0zojzx/image/upload";
 const CLOUDINARY_UPLOAD_PRESET = "ml_default";
@@ -47,6 +47,7 @@ const ModificationRequestForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const accessToken = useAuthToken();
 
   //   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   //   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -95,13 +96,15 @@ const ModificationRequestForm = () => {
     { resetForm, setSubmitting }: FormikHelpers<FormValues>
   ) => {
     try {
+      if (!accessToken) return;
+
       const formData = {
         ...values,
         images: imageUrl,
       };
 
       console.log("Submitting data:", formData);
-      await createModificationRequest(formData);
+      await createModificationRequest(formData, accessToken);
       toast.success("Modification request added successfully!");
       resetForm();
       handleClose();

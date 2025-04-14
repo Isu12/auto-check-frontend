@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Spinner, Table, Alert, Image } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { fetchModificationRequestById } from "../../ModificationRequest/ModificationControl/ModificationRequest";
-// import axios from "axios";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 
 interface ViewModificationRequestModalProps {
   recordId: string;
@@ -13,6 +13,7 @@ const ViewModificationRequestModal = ({ recordId, onClose }: ViewModificationReq
   const [showModal, setShowModal] = useState(false);
   const [modificationRequest, setModificationRequest] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const accessToken = useAuthToken();
 
   const handleClose = () => {
     setShowModal(false);
@@ -23,10 +24,12 @@ const ViewModificationRequestModal = ({ recordId, onClose }: ViewModificationReq
 
   useEffect(() => {
     const getModificationRequest = async () => {
+      if (!accessToken) return;
+
       if (!recordId) return;
       setLoading(true);
       try {
-        const data = await fetchModificationRequestById(recordId);
+        const data = await fetchModificationRequestById(recordId, accessToken);
         setModificationRequest(data);
         handleShow();
       } catch (error) {

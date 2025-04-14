@@ -10,10 +10,14 @@ const BASE_URL = 'http://localhost:5555/api/modification-request/'
 /**
  * Fetches all modification requests.
  */
-export const fetchModificationRequest = async (): Promise<ModificationRequestInterface[]> => {
+export const fetchModificationRequest = async (accessToken: string): Promise<ModificationRequestInterface[]> => {
   try {
     console.log("ENV:", process.env.NEXT_PUBLIC_BACKEND_URL);
-    const response = await axios.get(BASE_URL);
+    const response = await axios.get(BASE_URL, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     return response.data;
   } catch (error) {
     throw new Error("Failed to fetch modification requests.");
@@ -24,27 +28,39 @@ export const fetchModificationRequest = async (): Promise<ModificationRequestInt
  * Fetches a single modification request by its ID.
  * @param id - The ID of the modification request to fetch.
  */
-export const fetchModificationRequestById = async (id: string): Promise<ModificationRequestInterface> => {
+export const fetchModificationRequestById = async (id: string, accessToken:string): Promise<ModificationRequestInterface> => {
   try {
-    const response = await axios.get(`${BASE_URL}/${id}`);
+    const response = await axios.get(`${BASE_URL}/${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     return response.data;
   } catch (error) {
     throw new Error("Failed to fetch modification request by ID.");
   }
 };
 
-export const createModificationRequest = async (record: ModificationRequestInterface): Promise<ModificationRequestInterface> => {
+export const createModificationRequest = async (record: ModificationRequestInterface, accessToken:string): Promise<ModificationRequestInterface> => {
     try {
-      const response = await axios.post(BASE_URL, record); // Accepts the full record object
+      const response = await axios.post(BASE_URL, record, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }); // Accepts the full record object
       return response.data;
     } catch (error) {
       throw new Error("Failed to create modification request.");
     }
   };
 
-export const updateModificationRequest = async (record: ModificationRequestInterface, updatedValues: { VehicleId: string; OwnerId: string; ModificationType: string; Description: string; ProposedChanges: string; }) => {
+export const updateModificationRequest = async (record: ModificationRequestInterface, updatedValues: { VehicleId: string; OwnerId: string; ModificationType: string; Description: string; ProposedChanges: string; }, accessToken:string) => {
     try {
-      const response = await axios.put(`${BASE_URL}/${record._id}`, record);
+      const response = await axios.put(`${BASE_URL}/${record._id}`, record, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return response.data;
     } catch (error) {
       throw new Error("Failed to update modification request.");
@@ -82,9 +98,13 @@ export const updateModificationRequest = async (record: ModificationRequestInter
  * Deletes a modification request by its ID.
  * @param id - The ID of the modification request to delete.
  */
-export const deleteModificationRequest = async (id: string): Promise<void> => {
+export const deleteModificationRequest = async (id: string, accessToken:string): Promise<void> => {
   try {
-    await axios.delete(`${BASE_URL}${id}`);
+    await axios.delete(`${BASE_URL}${id}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
   } catch (error) {
     throw new Error("Failed to delete modification request.");
   }

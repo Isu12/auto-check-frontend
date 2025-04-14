@@ -87,7 +87,7 @@ const Navbar = () => {
                   <button onClick={() => router.push("/echo-test-reports/test-reports")}>Echo Tests</button>
                 </li>
                 <li className="hover:bg-blue-300 px-4 py-2 transition-all">
-                  <button onClick={() => router.push("/modification-request/")}>Modifications</button>
+                  <button onClick={() => router.push("/ModificationRequest/Modification")}>Modifications</button>
                 </li>
               </ul>
             )}
@@ -188,7 +188,7 @@ const Navbar = () => {
                   <button onClick={() => router.push("/echo-test-reports/test-reports")}>Echo Tests</button>
                 </li>
                 <li className="hover:bg-blue-300 px-4 py-2 transition-all">
-                  <button onClick={() => router.push("/modification-request/")}>Modifications</button>
+                  <button onClick={() => router.push("/ModificationRequest/Modification")}>Modifications</button>
                 </li>
               </ul>
             )}

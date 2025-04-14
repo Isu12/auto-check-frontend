@@ -7,7 +7,7 @@ import { object, string, array } from "zod";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthToken } from "@/app/auth/hooks/accessHook";
-import { Button } from "@/components/ui/button";
+import { Button } from "../../auth/ui/button";
 import { UserDetails } from "@/app/auth/types/user/user-details.interface";
 import { updateUserDetails } from "../services/api";
 
