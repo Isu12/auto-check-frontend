@@ -1,12 +1,11 @@
 "use client";
-
-// EditModal.tsx
 import React, { useState, useEffect } from "react";
-import { Button } from "../../../Components/ui/button";
-import { Input } from "../../../Components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
 import { Modal } from "react-bootstrap";
-import axios from "axios";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
+import { updateServiceStation } from "../services/api";
 
 const businessTypes = [
   "Service Station",
@@ -31,6 +30,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
   onSave,
 }) => {
   const [editedStation, setEditedStation] = useState<StationInfoInterface | null>(null);
+  const accessToken = useAuthToken();
 
   useEffect(() => {
     if (isOpen) {
@@ -51,13 +51,14 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
   };
 
   const handleSave = async () => {
+    if (!accessToken) {
+      console.error("Access token is missing.");
+      return;
+    }
+  
     if (editedStation) {
       try {
-        const response = await axios.put(
-          `http://localhost:5000/api/stations/${editedStation._id}`,
-          editedStation
-        );
-        const updatedStation = response.data;
+        const updatedStation = await updateServiceStation(editedStation, {}, accessToken);
         onSave(updatedStation);
         onClose();
       } catch (error) {
@@ -65,6 +66,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
       }
     }
   };
+  
 
   if (!isOpen || !editedStation) return null;
 

@@ -26,6 +26,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
 import ViewServiceRecordModal from "./ServiceRecord";
 import EditServiceRecordModal from "./EditServiceRecordModal";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -40,7 +41,6 @@ const ServiceRecordGrid = () => {
   const [rowData, setRowData] = useState<ServiceRecordInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editRecord, setEditRecord] = useState<ServiceRecordInterface | null>(null);
@@ -49,6 +49,7 @@ const ServiceRecordGrid = () => {
   const [selectedRecord, setSelectedRecord] = useState<ServiceRecordInterface | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const accessToken = useAuthToken();
 
   const onGridReady = (params: any) => {
     setGridApi(params.api);
@@ -81,16 +82,18 @@ const ServiceRecordGrid = () => {
   };
 
   const handleSaveEditedRecord = async (updatedRecord: ServiceRecordInterface) => {
+    if (!accessToken) return;
+
     try {
       // Create an updatedValues object with the fields you want to update
       const updatedValues = {
         ServiceCost: updatedRecord.ServiceCost, // Example field you want to update
         // You can add other fields here as necessary
       };
-  
+
       // Call your API or service function to save the updated record
-      await updateServiceRecord(updatedRecord, updatedValues);
-  
+      await updateServiceRecord(updatedRecord, updatedValues, accessToken);
+
       setRowData((prevData) =>
         prevData.map((record) =>
           record._id === updatedRecord._id ? updatedRecord : record
@@ -101,10 +104,20 @@ const ServiceRecordGrid = () => {
       toast.error("Error updating service record");
     }
   };
-  
+
 
 
   const [colDefs] = useState<ColDef[]>([
+    {
+      headerName: "Reg No",
+      filter: "agTextColumnFilter",
+      valueGetter: (params) => params.data.vehicle?.Registration_no || 'N/A'
+    },
+    {
+      headerName: "Chassis No",
+      filter: "agTextColumnFilter",
+      valueGetter: (params) => params.data.vehicle?.Chasisis_No || 'N/A'
+    },
     { field: "OdometerReading", headerName: "Odometer Reading", filter: "agNumberColumnFilter", valueFormatter: (params) => `${params.value} Km` },
     {
       field: "DateOfService",
@@ -157,14 +170,14 @@ const ServiceRecordGrid = () => {
             onClick={() => window.open(params.value, "_blank")}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.src = "https://via.placeholder.com/50"; // Fallback image
+              target.src = "https://via.placeholder.com/50";
             }}
           />
         );
       },
       sortable: false,
       filter: false,
-    },       
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -192,20 +205,29 @@ const ServiceRecordGrid = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const data = await fetchServiceRecords();
+        setLoading(true);
+        setError(null);
+        const data = await fetchServiceRecords(accessToken);
         setRowData(data);
       } catch (error: any) {
-        setError(error.message);
-        window.alert("Error fetching data: " + error.message);
+        if (error.message.includes("Unauthorized")) {
+          toast.error("Session expired. Please login again.");
+        }
+        setError(error.message || "Failed to fetch service records");
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-
+  }, [accessToken]);
   const handleDeleteClick = (id: string) => {
     setDeleteId(id);
     setIsDialogOpen(true);
@@ -213,10 +235,10 @@ const ServiceRecordGrid = () => {
 
   const handleConfirmDelete = async () => {
     if (!deleteId) return;
+    if (!accessToken) return;
 
     try {
-      await deleteServiceRecord(deleteId);
-      // Remove the deleted record from state
+      await deleteServiceRecord(deleteId, accessToken);
       setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
       toast.success("Service record deleted successfully!");
     } catch (error: any) {
@@ -258,7 +280,7 @@ const ServiceRecordGrid = () => {
         rowData={filteredRowData}
         columnDefs={colDefs}
         pagination={true}
-        paginationPageSize={15}
+        paginationPageSize={8}
         domLayout="autoHeight"
         rowModelType="clientSide"
         onGridReady={onGridReady}
@@ -293,7 +315,3 @@ const ServiceRecordGrid = () => {
 };
 
 export default ServiceRecordGrid;
-function saveServiceRecord(updatedRecord: ServiceRecordInterface) {
-  throw new Error("Function not implemented.");
-}
-

@@ -26,6 +26,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
 import ViewInsuranceClaimModal from "../Components/InsuranceClaim";
 import EditInsuranceClaimModal from "./EditInsuranceClaimModal";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -40,7 +41,6 @@ const InsuranceClaimGrid = () => {
   const [rowData, setRowData] = useState<InsuranceClaimInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editRecord, setEditRecord] = useState<InsuranceClaimInterface | null>(null);
@@ -49,6 +49,7 @@ const InsuranceClaimGrid = () => {
   const [selectedRecord, setSelectedRecord] = useState<InsuranceClaimInterface | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const accessToken = useAuthToken();
 
   const onGridReady = (params: any) => {
     setGridApi(params.api);
@@ -71,15 +72,17 @@ const InsuranceClaimGrid = () => {
 
   const handleViewClick = (record: InsuranceClaimInterface) => {
     setSelectedRecord(record);
-    setIsViewModalOpen(true); 
+    setIsViewModalOpen(true);
   };
 
   const handleCloseViewModal = () => {
-    setSelectedRecord(null); 
-    setIsViewModalOpen(false); 
+    setSelectedRecord(null);
+    setIsViewModalOpen(false);
   };
 
   const handleSaveEditedRecord = async (updatedRecord: InsuranceClaimInterface) => {
+    if (!accessToken) return;
+
     try {
       const updatedValues = {
         IssuedDate: updatedRecord.ClaimAmountApproved,
@@ -87,8 +90,8 @@ const InsuranceClaimGrid = () => {
         TestingCenterName: updatedRecord.ClaimDate,
         TestingCenterBranch: updatedRecord.ClaimType,
       };
-      await updateInsuranceClaimRecord(updatedRecord,updatedValues);
-  
+      await updateInsuranceClaimRecord(updatedRecord, updatedValues, accessToken);
+
       setRowData((prevData) =>
         prevData.map((record) =>
           record._id === updatedRecord._id ? updatedRecord : record
@@ -101,6 +104,16 @@ const InsuranceClaimGrid = () => {
   };
 
   const [colDefs] = useState<ColDef[]>([
+    {
+      headerName: "Reg No",
+      filter: "agTextColumnFilter",
+      valueGetter: (params) => params.data.vehicle?.Registration_no || 'N/A'
+    },
+    {
+      headerName: "Chassis No",
+      filter: "agTextColumnFilter",
+      valueGetter: (params) => params.data.vehicle?.Chasisis_No || 'N/A'
+    },
     { field: "InsuranceID", headerName: "Insurance ID", filter: "agTextColumnFilter" },
     {
       field: "ClaimDate",
@@ -112,15 +125,15 @@ const InsuranceClaimGrid = () => {
       },
     },
     { field: "ClaimType", headerName: "Claim Type", filter: "agTextColumnFilter" },
-    { 
-      field: "ClaimAmountRequested", 
-      headerName: "Amount Requested", 
+    {
+      field: "ClaimAmountRequested",
+      headerName: "Amount Requested",
       filter: "agNumberColumnFilter",
       valueFormatter: (params) => params.value ? `LKR ${params.value.toFixed(2)}` : ''
     },
-    { 
-      field: "ClaimAmountApproved", 
-      headerName: "Amount Approved", 
+    {
+      field: "ClaimAmountApproved",
+      headerName: "Amount Approved",
       filter: "agNumberColumnFilter",
       valueFormatter: (params) => params.value ? `LKR ${params.value.toFixed(2)}` : ''
     },
@@ -137,7 +150,7 @@ const InsuranceClaimGrid = () => {
         ].filter(url => url);
 
         if (images.length === 0) return "No Images";
-        
+
         return (
           <div style={{ display: "flex", gap: "5px" }}>
             {images.slice(0, 3).map((url, index) => (
@@ -179,7 +192,7 @@ const InsuranceClaimGrid = () => {
       },
       sortable: false,
       filter: false,
-    },       
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -207,19 +220,31 @@ const InsuranceClaimGrid = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const data = await fetchInsuranceClaimRecords();
+        setLoading(true);
+        setError(null);
+        const data = await fetchInsuranceClaimRecords(accessToken);
         setRowData(data);
       } catch (error: any) {
-        setError(error.message);
-        window.alert("Error fetching data: " + error.message);
+        if (error.message.includes("Unauthorized")) {
+          toast.error("Your session has expired. Please login again.", {
+            toastId: 'unauthorized-error', // Prevent duplicate toasts
+            autoClose: 5000,
+          });
+        }
+        setError(error.message || "Failed to fetch insurance claims");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [accessToken]);
 
   const handleDeleteClick = (id: string) => {
     setDeleteId(id);
@@ -272,7 +297,7 @@ const InsuranceClaimGrid = () => {
         rowData={filteredRowData}
         columnDefs={colDefs}
         pagination={true}
-        paginationPageSize={15}
+        paginationPageSize={8}
         domLayout="autoHeight"
         rowModelType="clientSide"
         onGridReady={onGridReady}

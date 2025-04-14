@@ -28,20 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
     <html lang="en" className="h-full">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
-        <div className="flex flex-1">
-          <Sidebar />
-          <div className="flex-1 flex flex-col">
-            <main className="flex-1 p-4 mt-[80px] mb-4"> {/* Added mb-4 for bottom padding */}
-              {children}
-            </main>
-            <Footer />
+        <div className="flex flex-col min-h-screen">
+          <div className="flex flex-1">
+            <Sidebar />
+            <div className="flex-1 flex flex-col">
+              <main className="flex-1 p-4 mt-[80px] pb-20"> {/* Increased bottom padding */}
+                {children}
+              </main>
+            </div>
           </div>
+          <Footer/> {/* Ensure footer stays at bottom */}
         </div>
         <ToastContainer />
-
       </body>
     </html>
   );

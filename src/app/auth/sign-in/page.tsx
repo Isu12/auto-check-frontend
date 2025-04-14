@@ -15,7 +15,7 @@ import {
   CardTitle,
   CardDescription,
 } from '../ui/card';
-import { toast } from 'sonner';
+import { toast } from 'react-toastify';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignIn() {
@@ -52,18 +52,10 @@ export default function SignIn() {
       // Store tokens
       tokenStorage.setTokens(data.accessToken, data.refreshToken);
 
-      // Redirect based on verification status
-      if (!data.isEmailVerified) {
-        router.push('/profile');
-        toast.info('Please verify your email to access all features');
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        router.replace('/dashboard');
-      }
+        router.replace('/profile');
 
     } catch (err) {
-      console.error('Login error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to sign in';
+      const errorMessage = 'Failed to sign in';
       toast.error(errorMessage);
     } finally {
       setLoading(false);

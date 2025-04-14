@@ -6,7 +6,7 @@ import { Modal } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { updateInsuranceClaimRecord } from "../Services/insurance-claim.servie";
-
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 interface EditInsuranceClaimModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +21,7 @@ const EditInsuranceClaimModal: React.FC<EditInsuranceClaimModalProps> = ({
   onSave,
 }) => {
   const [editedRecord, setEditedRecord] = useState<InsuranceClaimInterface | null>(null);
+  const accessToken = useAuthToken();
 
   useEffect(() => {
     if (isOpen && record) {
@@ -59,6 +60,7 @@ const EditInsuranceClaimModal: React.FC<EditInsuranceClaimModalProps> = ({
   };
 
   const handleSave = async () => {
+    if (!accessToken) return;
     if (editedRecord && editedRecord._id) {
       try {
         const updatedValues = {
@@ -75,7 +77,7 @@ const EditInsuranceClaimModal: React.FC<EditInsuranceClaimModalProps> = ({
           DamageImageURL5: editedRecord.DamageImageURL5,
         };
 
-        await updateInsuranceClaimRecord(editedRecord, updatedValues);
+        await updateInsuranceClaimRecord(editedRecord, updatedValues, accessToken);
         onSave(editedRecord);
         onClose();
       } catch (error) {

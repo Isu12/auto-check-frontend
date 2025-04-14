@@ -1,3 +1,5 @@
+import { VehicleInterface } from "@/app/dashboard/types/vehicle.interface";
+
 export interface EchoTestInterface {
   _id?: string;
   TestID?: number;
@@ -7,4 +9,5 @@ export interface EchoTestInterface {
   TestingCenterBranch?: string;
   CertificateFileURL?: string;
   CreatedAt?: string;
+  vehicle?: VehicleInterface; 
 }

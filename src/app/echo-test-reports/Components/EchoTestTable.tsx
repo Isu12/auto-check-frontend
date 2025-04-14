@@ -26,6 +26,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
 import ViewEchoTestRecordModal from "./EchoTestRecord";
 import EditEchoTestModal from "./EditEchoTestModal";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -49,6 +50,7 @@ const EchoTestRecordGrid = () => {
   const [selectedRecord, setSelectedRecord] = useState<EchoTestInterface | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const accessToken = useAuthToken();
 
   const onGridReady = (params: any) => {
     setGridApi(params.api);
@@ -69,18 +71,21 @@ const EchoTestRecordGrid = () => {
     setIsEditModalOpen(true);
   };
 
-
   const handleViewClick = (record: EchoTestInterface) => {
     setSelectedRecord(record);
-    setIsViewModalOpen(true); 
+    setTimeout(() => {
+      setIsViewModalOpen(true);
+    }, 50); // small delay to ensure state is updated
   };
 
   const handleCloseViewModal = () => {
-    setSelectedRecord(null); 
-    setIsViewModalOpen(false); 
+    setSelectedRecord(null);
+    setIsViewModalOpen(false);
   };
 
   const handleSaveEditedRecord = async (updatedRecord: EchoTestInterface) => {
+    if (!accessToken) return;
+
     try {
       const updatedValues = {
         IssuedDate: updatedRecord.IssuedDate,
@@ -88,8 +93,8 @@ const EchoTestRecordGrid = () => {
         TestingCenterName: updatedRecord.TestingCenterName,
         TestingCenterBranch: updatedRecord.TestingCenterBranch,
       };
-      await updateEchoTestRecord(updatedRecord, updatedValues);
-  
+      await updateEchoTestRecord(updatedRecord, updatedValues, accessToken);
+
       setRowData((prevData) =>
         prevData.map((record) =>
           record._id === updatedRecord._id ? updatedRecord : record
@@ -100,14 +105,28 @@ const EchoTestRecordGrid = () => {
       toast.error("Error updating echo test record");
     }
   };
-  
 
 
   const [colDefs] = useState<ColDef[]>([
-    { field: "TestID", headerName: "Test ID", filter: "agNumberColumnFilter", valueFormatter: (params) => `${params.value}` },
+    {
+      headerName: "Reg No",
+      filter: "agTextColumnFilter",
+      valueGetter: (params) => params.data.vehicle?.Registration_no || 'N/A'
+    },
+    {
+      headerName: "Chassis No",
+      filter: "agTextColumnFilter",
+      valueGetter: (params) => params.data.vehicle?.Chasisis_No || 'N/A'
+    },
+    {
+      field: "TestID",
+      headerName: "Test ID",
+      filter: "agNumberColumnFilter",
+      valueFormatter: (params) => `${params.value}`
+    },
     {
       field: "IssuedDate",
-      headerName: "Date of Issue",
+      headerName: "Issue Date",
       filter: "agDateColumnFilter",
       valueFormatter: (params) => {
         if (!params.value) return "";
@@ -116,18 +135,22 @@ const EchoTestRecordGrid = () => {
     },
     {
       field: "ExpiryDate",
-      headerName: "Date of Expire",
+      headerName: "Expiry Date",
       filter: "agDateColumnFilter",
       valueFormatter: (params) => {
         if (!params.value) return "";
         return new Date(params.value).toLocaleDateString();
       },
     },
-    { field: "TestingCenterName", headerName: "Testing Center Name", filter: "agTextColumnFilter" },
-    { field: "TestingCenterBranch", headerName: "Testing Center Branch", filter: "agTextColumnFilter" },
+    {
+      field: "TestingCenterName",
+      headerName: "Center",
+      filter: "agTextColumnFilter",
+      width: 150
+    },
     {
       field: "CertificateFileURL",
-      headerName: "Test Certificate",
+      headerName: "Certificate",
       cellRenderer: (params: { value: string }) => {
         if (!params.value) return "No Image";
         return (
@@ -152,7 +175,7 @@ const EchoTestRecordGrid = () => {
       },
       sortable: false,
       filter: false,
-    },       
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -162,14 +185,16 @@ const EchoTestRecordGrid = () => {
             <button onClick={() => params.data._id && handleDeleteClick(params.data._id)}>
               <Trash2 size={20} color="red" className="ml-3" />
             </button>
-
             <button onClick={() => handleEditClick(params.data)}>
               <Edit size={20} color="navy" className="ml-3" />
             </button>
-
-            <button onClick={() => handleViewClick(params.data)}>
+            <button onClick={() => {
+              console.log("Viewing record:", params.data);
+              handleViewClick(params.data);
+            }}>
               <Eye size={20} color="green" className="ml-3" />
             </button>
+
           </div>
         );
       },
@@ -180,19 +205,27 @@ const EchoTestRecordGrid = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!accessToken) return;
       try {
-        const data = await fetchEchoTestRecords();
+        const data = await fetchEchoTestRecords(accessToken);
         setRowData(data);
       } catch (error: any) {
         setError(error.message);
-        window.alert("Error fetching data: " + error.message);
+        if (error.message.includes("Unauthorized")) {
+          toast.error("Session expired. Please login again.", {
+            autoClose: 5000,
+          });
+        } else {
+          toast.error("Error fetching data: " + error.message);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [accessToken]);
+
 
   const handleDeleteClick = (id: string) => {
     setDeleteId(id);
@@ -201,9 +234,10 @@ const EchoTestRecordGrid = () => {
 
   const handleConfirmDelete = async () => {
     if (!deleteId) return;
+    if (!accessToken) return;
 
     try {
-      await deleteEchoTestRecord(deleteId);
+      await deleteEchoTestRecord(deleteId, accessToken);
       // Remove the deleted record from state
       setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
       toast.success("Echo Test record deleted successfully!");
@@ -246,7 +280,7 @@ const EchoTestRecordGrid = () => {
         rowData={filteredRowData}
         columnDefs={colDefs}
         pagination={true}
-        paginationPageSize={15}
+        paginationPageSize={8}
         domLayout="autoHeight"
         rowModelType="clientSide"
         onGridReady={onGridReady}
@@ -260,12 +294,13 @@ const EchoTestRecordGrid = () => {
         title="Delete Confirmation"
       />
 
-      {isViewModalOpen && selectedRecord && (
+      {isViewModalOpen && selectedRecord && selectedRecord._id && (
         <ViewEchoTestRecordModal
-          recordId={selectedRecord._id ?? ""}
+          recordId={selectedRecord._id}
           onClose={handleCloseViewModal}
         />
       )}
+
 
       {isEditModalOpen && editRecord && (
         <EditEchoTestModal

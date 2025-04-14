@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../Components/ui/button";
+import { Button } from "./ui/button";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -7,14 +7,14 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
   AlertDialogDescription,
-} from "@/Components/ui/alert-dialog"; 
+} from "./ui/alert-dialog"; 
 
 
 type ConfirmationDialogProps = {
   isOpen:boolean;
   onClose: () => void;
   onConfirm: () => void;
-  message: string;
+  message: React.ReactNode;
   title?: string;
 }
 

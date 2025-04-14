@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Spinner, Table, Alert, Image } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { fetchServiceRecordById } from "../../ServiceRecord/Services/ServiceRecord.service";
-
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 interface ViewServiceRecordModalProps {
   recordId: string;
   onClose: () => void;
@@ -12,6 +12,7 @@ const ViewServiceRecordModal = ({ recordId, onClose }: ViewServiceRecordModalPro
   const [showModal, setShowModal] = useState(false);
   const [serviceRecord, setServiceRecord] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const accessToken = useAuthToken();
 
   const handleClose = () => {
     setShowModal(false);
@@ -23,9 +24,11 @@ const ViewServiceRecordModal = ({ recordId, onClose }: ViewServiceRecordModalPro
   useEffect(() => {
     const getServiceRecord = async () => {
       if (!recordId) return;
+      if (!accessToken) return;
+
       setLoading(true);
       try {
-        const data = await fetchServiceRecordById(recordId);
+        const data = await fetchServiceRecordById(recordId, accessToken);
         setServiceRecord(data);
         handleShow();
       } catch (error) {

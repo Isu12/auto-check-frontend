@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Spinner, Table, Alert, Image } from "react-bootstrap";
+import { Modal, Button, Spinner, Table, Alert, Image, Card } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { fetchInsuranceClaimRecordById } from "../Services/insurance-claim.servie";
 import { InsuranceClaimInterface } from "../types/insurance-claim.interface";
+import { VehicleInterface } from "../../dashboard/types/vehicle.interface";
+import { useAuthToken } from "@/app/auth/hooks/accessHook";
 
 interface ViewInsuranceClaimModalProps {
   recordId: string;
@@ -12,7 +14,9 @@ interface ViewInsuranceClaimModalProps {
 const ViewInsuranceClaimModal = ({ recordId, onClose }: ViewInsuranceClaimModalProps) => {
   const [showModal, setShowModal] = useState(false);
   const [insuranceClaim, setInsuranceClaim] = useState<InsuranceClaimInterface | null>(null);
+  const [vehicleDetails, setVehicleDetails] = useState<VehicleInterface | null>(null);
   const [loading, setLoading] = useState(false);
+  const accessToken = useAuthToken();
 
   const handleClose = () => {
     setShowModal(false);
@@ -23,11 +27,18 @@ const ViewInsuranceClaimModal = ({ recordId, onClose }: ViewInsuranceClaimModalP
 
   useEffect(() => {
     const getInsuranceClaim = async () => {
-      if (!recordId) return;
+      if (!accessToken || !recordId) return;
+      
       setLoading(true);
       try {
-        const data = await fetchInsuranceClaimRecordById(recordId);
+        const data = await fetchInsuranceClaimRecordById(recordId, accessToken);
         setInsuranceClaim(data);
+        
+        // Check if vehicle data is populated
+        if (data.vehicle && typeof data.vehicle === 'object') {
+          setVehicleDetails(data.vehicle as VehicleInterface);
+        }
+        
         handleShow();
       } catch (error) {
         toast.error("Error fetching insurance claim.");
@@ -37,7 +48,7 @@ const ViewInsuranceClaimModal = ({ recordId, onClose }: ViewInsuranceClaimModalP
     };
 
     getInsuranceClaim();
-  }, [recordId]);
+  }, [recordId, accessToken]);
 
   const formatDate = (date: Date | string | undefined): string => {
     if (!date) return 'N/A';
@@ -89,10 +100,64 @@ const ViewInsuranceClaimModal = ({ recordId, onClose }: ViewInsuranceClaimModalP
     );
   };
 
+  const renderVehicleDetails = () => {
+    if (!vehicleDetails) return null;
+
+    return (
+      <Card className="mt-4">
+        <Card.Header className="bg-secondary text-white">
+          <h5>Vehicle Details</h5>
+        </Card.Header>
+        <Card.Body>
+          <Table striped bordered hover responsive>
+            <tbody>
+              <tr>
+                <td><strong>Registration No:</strong></td>
+                <td>{vehicleDetails.Registration_no || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>Chassis No:</strong></td>
+                <td>{vehicleDetails.Chasisis_No || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>Owner:</strong></td>
+                <td>{vehicleDetails.Current_Owner || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>Address:</strong></td>
+                <td>{vehicleDetails.Address || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>NIC:</strong></td>
+                <td>{vehicleDetails.NIC || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>Make:</strong></td>
+                <td>{vehicleDetails.Make || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>Model:</strong></td>
+                <td>{vehicleDetails.Model || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>Color:</strong></td>
+                <td>{vehicleDetails.Colour || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td><strong>Year of Manufacture:</strong></td>
+                <td>{vehicleDetails.Year_of_Manufacture || 'N/A'}</td>
+              </tr>
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
+    );
+  };
+
   return (
-    <Modal show={showModal} onHide={handleClose} size="lg" centered>
+    <Modal show={showModal} onHide={handleClose} size="lg" centered scrollable>
       <Modal.Header closeButton className="bg-dark text-white">
-        <Modal.Title>🏥 Insurance Claim Details</Modal.Title>
+        <Modal.Title>Insurance Claim Details</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-4">
         {loading ? (
@@ -101,36 +166,40 @@ const ViewInsuranceClaimModal = ({ recordId, onClose }: ViewInsuranceClaimModalP
             <p className="mt-3">Fetching insurance claim details...</p>
           </div>
         ) : insuranceClaim ? (
-          <div className="border rounded p-3 bg-light shadow-sm">
-            <h5 className="text-primary">📋 Claim ID: {insuranceClaim.InsuranceID || 'N/A'}</h5>
+          <>
+            <div className="border rounded p-3 bg-light shadow-sm">
+              <h5 className="text-primary">Claim ID: {insuranceClaim.InsuranceID || 'N/A'}</h5>
 
-            <Table striped bordered hover responsive className="mt-3">
-              <tbody>
-                <tr>
-                  <td><strong>📅 Claim Date:</strong></td>
-                  <td>{formatDate(insuranceClaim.ClaimDate)}</td>
-                </tr>
-                <tr>
-                  <td><strong>🔖 Claim Type:</strong></td>
-                  <td>{insuranceClaim.ClaimType || 'N/A'}</td>
-                </tr>
-                <tr>
-                  <td><strong>💵 Amount Requested:</strong></td>
-                  <td>{formatCurrency(insuranceClaim.ClaimAmountRequested)}</td>
-                </tr>
-                <tr>
-                  <td><strong>✅ Amount Approved:</strong></td>
-                  <td>{formatCurrency(insuranceClaim.ClaimAmountApproved)}</td>
-                </tr>
-                <tr>
-                  <td><strong>📝 Damage Description:</strong></td>
-                  <td>{insuranceClaim.DamageDescription || 'N/A'}</td>
-                </tr>
-              </tbody>
-            </Table>
+              <Table striped bordered hover responsive className="mt-3">
+                <tbody>
+                  <tr>
+                    <td><strong>Claim Date:</strong></td>
+                    <td>{formatDate(insuranceClaim.ClaimDate)}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Claim Type:</strong></td>
+                    <td>{insuranceClaim.ClaimType || 'N/A'}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Amount Requested:</strong></td>
+                    <td>{formatCurrency(insuranceClaim.ClaimAmountRequested)}</td>
+                  </tr>
+                  <tr>
+                    <td><strong> Amount Approved:</strong></td>
+                    <td>{formatCurrency(insuranceClaim.ClaimAmountApproved)}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Damage Description:</strong></td>
+                    <td>{insuranceClaim.DamageDescription || 'N/A'}</td>
+                  </tr>
+                </tbody>
+              </Table>
 
-            {renderDamageImages()}
-          </div>
+              {renderDamageImages()}
+            </div>
+
+            {renderVehicleDetails()}
+          </>
         ) : (
           <Alert variant="warning">⚠️ No insurance claim found.</Alert>
         )}
