@@ -13,9 +13,9 @@ import {
 } from "ag-grid-community";
 import { ServiceRecordInterface } from "../types/ServiceRecord.Interface";
 import { Trash2, Download, Search, Eye, Edit } from "lucide-react";
-import ConfirmationDialog from "../../../components/ConfirmationDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import ConfirmationDialog from "../../../Components/ConfirmationDialog";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
 import {
   fetchServiceRecords,
   deleteServiceRecord,
