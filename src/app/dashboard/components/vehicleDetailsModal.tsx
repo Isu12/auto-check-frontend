@@ -7,7 +7,7 @@ import {
   Wrench, Activity, Shield, List, TestTube2, FileSearch,
   ChevronDown, ChevronUp
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../auth/ui/button';
 import EchoTestForm from '@/app/echo-test-reports/Components/EchoTestForm';
 import InsuranceClaimForm from '@/app/isurance-claim/Components/InsuranceClaimForm';
 import { useAuthToken } from "@/app/auth/hooks/accessHook";

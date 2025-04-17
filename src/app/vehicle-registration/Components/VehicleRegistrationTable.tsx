@@ -1,3 +1,4 @@
+"use client"
 import { AgGridReact } from "ag-grid-react";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
@@ -14,8 +15,8 @@ import {
 import { VehicleRegistrationInterface } from "../../vehicle-registration/Types/VehicleRegistration.interface";
 import { Trash2, FilePen, Download, Search, Edit, Eye, Image as ImageIcon, Plus } from "lucide-react";
 import ConfirmationDialog from "../../../components/ConfirmationDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "../../auth/ui/button";
+import { Input } from "../../auth/ui/input";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
@@ -26,7 +27,7 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "../../auth/ui/tooltip";
 import { Line } from "react-chartjs-2";
 import {
     Chart as ChartJS,

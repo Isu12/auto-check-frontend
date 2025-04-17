@@ -62,7 +62,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const [showModal, setShowModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
 
   const handleClose = () => {
     setShowModal(false);
@@ -90,7 +90,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-    
+
     try {
       const response = await axios.post(
         CLOUDINARY_URL,
@@ -115,8 +115,8 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   const handleImageUpload = async (
-    file: File, 
-    fieldName: string, 
+    file: File,
+    fieldName: string,
     setFieldValue: (field: string, value: any) => void
   ) => {
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
@@ -222,7 +222,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                   {/* Section 1: Registration and Identification */}
                   <div className="col-md-6">
                     <h5 className="mb-3 text-dark">Registration and Identification</h5>
-                    
+
                     <div className="form-group mb-3">
                       <label className="form-label">Registration No*</label>
                       <Field
@@ -315,7 +315,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                   {/* Section 2: Owner Information */}
                   <div className="col-md-6">
                     <h5 className="mb-3 text-dark">Owner Information</h5>
-                    
+
                     <div className="form-group mb-3">
                       <label className="form-label">Current Owner*</label>
                       <Field
@@ -398,7 +398,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                   {/* Section 3: Vehicle Specifications */}
                   <div className="col-md-6">
                     <h5 className="mb-3 text-dark">Vehicle Specifications</h5>
-                    
+
                     <div className="form-group mb-3">
                       <label className="form-label">Make</label>
                       <Field
@@ -466,7 +466,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                   {/* Section 4: Dimensions and Capacity */}
                   <div className="col-md-6">
                     <h5 className="mb-3 text-dark">Dimensions and Capacity</h5>
-                    
+
                     <div className="form-group mb-3">
                       <label className="form-label">Seating Capacity</label>
                       <Field
@@ -538,7 +538,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                   {/* Section 5: Additional Information */}
                   <div className="col-md-6">
                     <h5 className="mb-3 text-dark">Additional Information</h5>
-                    
+
                     <div className="form-group mb-3">
                       <label className="form-label">Manufacturer's Description</label>
                       <Field
@@ -567,7 +567,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                   {/* Section 6: Registration and Taxes */}
                   <div className="col-md-6">
                     <h5 className="mb-3 text-dark">Registration and Taxes</h5>
-                    
+
                     <div className="form-group mb-3">
                       <label className="form-label">Date of First Registration</label>
                       <Field
@@ -593,7 +593,7 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                 {/* Section 7: Vehicle Photos */}
                 <div className="row">
                   <h5 className="mb-3 text-dark">Vehicle Photos</h5>
-                  
+
                   <div className="col-md-6">
                     <div className="form-group mb-3">
                       <label className="form-label">Front Photo</label>
@@ -614,9 +614,9 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       />
                       {uploadProgress.Front_Photo > 0 && (
                         <div className="progress mt-2">
-                          <div 
-                            className="progress-bar progress-bar-striped" 
-                            role="progressbar" 
+                          <div
+                            className="progress-bar progress-bar-striped"
+                            role="progressbar"
                             style={{ width: `${uploadProgress.Front_Photo}%` }}
                             aria-valuenow={uploadProgress.Front_Photo}
                             aria-valuemin={0}
@@ -628,11 +628,11 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       )}
                       {formikProps.values.Front_Photo && (
                         <div className="mt-2">
-                          <img 
-                            src={formikProps.values.Front_Photo} 
-                            alt="Front view" 
-                            className="img-thumbnail" 
-                            style={{ maxWidth: "150px", maxHeight: "150px" }} 
+                          <img
+                            src={formikProps.values.Front_Photo}
+                            alt="Front view"
+                            className="img-thumbnail"
+                            style={{ maxWidth: "150px", maxHeight: "150px" }}
                           />
                           <button
                             type="button"
@@ -665,9 +665,9 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       />
                       {uploadProgress.Left_Photo > 0 && (
                         <div className="progress mt-2">
-                          <div 
-                            className="progress-bar progress-bar-striped" 
-                            role="progressbar" 
+                          <div
+                            className="progress-bar progress-bar-striped"
+                            role="progressbar"
                             style={{ width: `${uploadProgress.Left_Photo}%` }}
                             aria-valuenow={uploadProgress.Left_Photo}
                             aria-valuemin={0}
@@ -679,11 +679,11 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       )}
                       {formikProps.values.Left_Photo && (
                         <div className="mt-2">
-                          <img 
-                            src={formikProps.values.Left_Photo} 
-                            alt="Left side view" 
-                            className="img-thumbnail" 
-                            style={{ maxWidth: "150px", maxHeight: "150px" }} 
+                          <img
+                            src={formikProps.values.Left_Photo}
+                            alt="Left side view"
+                            className="img-thumbnail"
+                            style={{ maxWidth: "150px", maxHeight: "150px" }}
                           />
                           <button
                             type="button"
@@ -718,9 +718,9 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       />
                       {uploadProgress.Right_Photo > 0 && (
                         <div className="progress mt-2">
-                          <div 
-                            className="progress-bar progress-bar-striped" 
-                            role="progressbar" 
+                          <div
+                            className="progress-bar progress-bar-striped"
+                            role="progressbar"
                             style={{ width: `${uploadProgress.Right_Photo}%` }}
                             aria-valuenow={uploadProgress.Right_Photo}
                             aria-valuemin={0}
@@ -732,11 +732,11 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       )}
                       {formikProps.values.Right_Photo && (
                         <div className="mt-2">
-                          <img 
-                            src={formikProps.values.Right_Photo} 
-                            alt="Right side view" 
-                            className="img-thumbnail" 
-                            style={{ maxWidth: "150px", maxHeight: "150px" }} 
+                          <img
+                            src={formikProps.values.Right_Photo}
+                            alt="Right side view"
+                            className="img-thumbnail"
+                            style={{ maxWidth: "150px", maxHeight: "150px" }}
                           />
                           <button
                             type="button"
@@ -769,9 +769,9 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       />
                       {uploadProgress.Rear_Photo > 0 && (
                         <div className="progress mt-2">
-                          <div 
-                            className="progress-bar progress-bar-striped" 
-                            role="progressbar" 
+                          <div
+                            className="progress-bar progress-bar-striped"
+                            role="progressbar"
                             style={{ width: `${uploadProgress.Rear_Photo}%` }}
                             aria-valuenow={uploadProgress.Rear_Photo}
                             aria-valuemin={0}
@@ -783,11 +783,11 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                       )}
                       {formikProps.values.Rear_Photo && (
                         <div className="mt-2">
-                          <img 
-                            src={formikProps.values.Rear_Photo} 
-                            alt="Rear view" 
-                            className="img-thumbnail" 
-                            style={{ maxWidth: "150px", maxHeight: "150px" }} 
+                          <img
+                            src={formikProps.values.Rear_Photo}
+                            alt="Rear view"
+                            className="img-thumbnail"
+                            style={{ maxWidth: "150px", maxHeight: "150px" }}
                           />
                           <button
                             type="button"
@@ -817,10 +817,10 @@ const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
                     className="btn btn-dark"
                     disabled={isUploading || isChecking || formikProps.isSubmitting}
                   >
-                    {isUploading ? "Uploading..." : 
-                     isChecking ? "Checking..." : 
-                     formikProps.isSubmitting ? "Submitting..." : 
-                     "Submit"}
+                    {isUploading ? "Uploading..." :
+                      isChecking ? "Checking..." :
+                        formikProps.isSubmitting ? "Submitting..." :
+                          "Submit"}
                   </button>
                 </div>
               </Form>
