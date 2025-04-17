@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Spinner, Table, Alert, Image } from "react-bootstrap";
+import { Modal, Button, Spinner, Table, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { fetchServiceRecordById } from "../../ServiceRecord/Services/ServiceRecord.service";
 
@@ -28,6 +28,7 @@ const ViewServiceRecordModal = ({ recordId, onClose }: ViewServiceRecordModalPro
         const data = await fetchServiceRecordById(recordId);
         setServiceRecord(data);
         handleShow();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Error fetching service record.");
       } finally {

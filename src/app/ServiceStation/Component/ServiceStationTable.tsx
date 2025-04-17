@@ -12,8 +12,7 @@ import {
   NumberFilterModule,
   DateFilterModule,
   GridApi,
-  CsvExportModule, 
-
+  CsvExportModule,
 } from "ag-grid-community";
 import { StationInfoInterface } from "./Types/ServiceStation.Interface";
 import { Download, Trash2, Eye, Search, Edit } from "lucide-react";
@@ -47,7 +46,9 @@ const StationInfoGrid = () => {
     useState<StationInfoInterface | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editRecord, setEditRecord] = useState<StationInfoInterface | null>(null);
+  const [editRecord, setEditRecord] = useState<StationInfoInterface | null>(
+    null
+  );
 
   const filteredRowData = rowData.filter((record) =>
     Object.values(record).some((value) =>
@@ -82,16 +83,17 @@ const StationInfoGrid = () => {
     setSelectedStation(null); // Reset the record state when closing the modal
     setIsViewModalOpen(false); // Close the modal
   };
-  
 
-  const handleSaveEditedRecord = async (updatedRecord: StationInfoInterface) => {
+  const handleSaveEditedRecord = async (
+    updatedRecord: StationInfoInterface
+  ) => {
     try {
       // Prepare the updated values to send in the API call
       const updatedValues = { businessRegNo: updatedRecord.businessRegNo };
-  
+
       // Make the API call to update the service record
       const response = await fetch(
-        `http://localhost:5000/api/stations/${updatedRecord._id}`,
+        `http://localhost:5555/api/stations/${updatedRecord._id}`,
         {
           method: "PUT", // PUT method to update the record
           headers: {
@@ -100,20 +102,20 @@ const StationInfoGrid = () => {
           body: JSON.stringify(updatedValues), // Send the updated values as JSON
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to update the service record");
       }
-  
+
       const updatedData = await response.json(); // Get the updated record from the response
-  
+
       // Update the state with the new updated record
       setRowData((prevData) =>
         prevData.map((record) =>
           record._id === updatedData._id ? updatedData : record
         )
       );
-  
+
       // Show success toast
       toast.success("Service record updated successfully!");
     } catch (error: any) {
@@ -121,7 +123,6 @@ const StationInfoGrid = () => {
       toast.error(`Error updating service record: ${error.message}`);
     }
   };
-  
 
   const handleConfirmDelete = async () => {
     if (!deleteId) return;

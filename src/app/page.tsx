@@ -22,20 +22,24 @@ const cardBackgrounds = [
 const features = [
   {
     title: "Vehicle History",
-    description: "Get complete history reports including accidents, ownership, and more.",
+    description:
+      "Get complete history reports including accidents, ownership, and more.",
   },
   {
     title: "Service Records",
-    description: "Access detailed maintenance and service history for any vehicle.",
+    description:
+      "Access detailed maintenance and service history for any vehicle.",
   },
   {
     title: "Modification Tracking",
-    description: "See all aftermarket modifications and upgrades made to the vehicle.",
+    description:
+      "See all aftermarket modifications and upgrades made to the vehicle.",
   },
   {
     title: "Insurance Claim History",
-    description: "View all insurance claims made on the vehicle including accident details.",
-  }
+    description:
+      "View all insurance claims made on the vehicle including accident details.",
+  },
 ];
 
 const SearchSection = () => {
@@ -67,7 +71,7 @@ const SearchSection = () => {
           transition: "background-image 1s ease-in-out",
           left: "-100px",
           right: "-300px",
-          marginTop: "-50px"
+          marginTop: "-50px",
         }}
       >
         {/* Dark Overlay */}
@@ -104,7 +108,8 @@ const SearchSection = () => {
               maxWidth: "800px",
             }}
           >
-            Discover vehicle history, service records, repairs, and modifications to make an informed decision on your next purchase.
+            Discover vehicle history, service records, repairs, and
+            modifications to make an informed decision on your next purchase.
           </p>
 
           {/* Track Vehicle Button */}
@@ -144,90 +149,109 @@ const SearchSection = () => {
       </div>
 
       {/* Features Cards Section */}
-      <div style={{
-        padding: "60px 20px",
-        backgroundColor: "#f8f9fa",
-        marginTop: "-40px",
-        width: "100%",
-      }}>
-        <div style={{
-          maxWidth: "1200px",
+      <div
+        style={{
+          padding: "60px 20px",
+          backgroundColor: "#f8f9fa",
+          marginTop: "-40px",
           width: "100%",
-          margin: "0 auto",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}>
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1200px",
+            width: "100%",
+            margin: "0 auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           {/* Centered Heading */}
-          <h2 style={{
-            fontSize: "40px",
-            marginBottom: "10px",
-            color: "#333",
-            textAlign: "center",
-          }}>
+          <h2
+            style={{
+              fontSize: "40px",
+              marginBottom: "10px",
+              color: "#333",
+              textAlign: "center",
+            }}
+          >
             Why Choose AutoCheck?
           </h2>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "30px",
-            width: "100%"
-          }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "30px",
+              width: "100%",
+            }}
+          >
             {features.map((feature, index) => (
-              <div key={index} style={{
-                position: "relative",
-                borderRadius: "12px",
-                padding: "30px",
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
-                transition: "transform 0.3s ease",
-                textAlign: "center",
-                transform: "translateY(-5px)",
-                marginTop: "50px",
-                height: "300px",
-                overflow: "hidden",
-                color: "white"
-              }}>
+              <div
+                key={index}
+                style={{
+                  position: "relative",
+                  borderRadius: "12px",
+                  padding: "30px",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
+                  transition: "transform 0.3s ease",
+                  textAlign: "center",
+                  transform: "translateY(-5px)",
+                  marginTop: "50px",
+                  height: "300px",
+                  overflow: "hidden",
+                  color: "white",
+                }}
+              >
                 {/* Card Background Image with Dark Overlay */}
-                <div style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  backgroundImage: `url(${cardBackgrounds[index]})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  zIndex: -2
-                }}></div>
-                <div style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "rgba(0, 0, 0, 0.7)",
-                  zIndex: -1
-                }}></div>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundImage: `url(${cardBackgrounds[index]})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    zIndex: -2,
+                  }}
+                ></div>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "rgba(0, 0, 0, 0.7)",
+                    zIndex: -1,
+                  }}
+                ></div>
 
-                <div style={{
-                  fontSize: "50px",
-                  marginBottom: "20px"
-                }}>
-                  
-                </div>
-                <h3 style={{
-                  fontSize: "22px",
-                  marginTop:"60px",
-                  marginBottom: "15px",
-                  color: "white"
-                }}>
+                <div
+                  style={{
+                    fontSize: "50px",
+                    marginBottom: "20px",
+                  }}
+                ></div>
+                <h3
+                  style={{
+                    fontSize: "22px",
+                    marginTop: "60px",
+                    marginBottom: "15px",
+                    color: "white",
+                  }}
+                >
                   {feature.title}
                 </h3>
-                <p style={{
-                  color: "rgba(255, 255, 255, 0.9)",
-                  lineHeight: "1.6"
-                }}>
+                <p
+                  style={{
+                    color: "rgba(255, 255, 255, 0.9)",
+                    lineHeight: "1.6",
+                  }}
+                >
                   {feature.description}
                 </p>
               </div>

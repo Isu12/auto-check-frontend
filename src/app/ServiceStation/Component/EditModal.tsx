@@ -14,7 +14,7 @@ const businessTypes = [
   "Auto Electrical Service",
   "Tire Service Center",
   "Car Wash",
-  "Other"
+  "Other",
 ];
 
 interface EditServiceStationModalProps {
@@ -30,7 +30,8 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
   record,
   onSave,
 }) => {
-  const [editedStation, setEditedStation] = useState<StationInfoInterface | null>(null);
+  const [editedStation, setEditedStation] =
+    useState<StationInfoInterface | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -39,7 +40,9 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
   }, [isOpen, record]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
     field: keyof StationInfoInterface
   ) => {
     if (editedStation) {
@@ -54,7 +57,7 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
     if (editedStation) {
       try {
         const response = await axios.put(
-          `http://localhost:5000/api/stations/${editedStation._id}`,
+          `http://localhost:5555/api/stations/${editedStation._id}`,
           editedStation
         );
         const updatedStation = response.data;
@@ -182,7 +185,9 @@ const EditModal: React.FC<EditServiceStationModalProps> = ({
 
           {/* Secondary Phone Number (Optional) */}
           <div className="form-group col-md-6">
-            <label className="form-label">Secondary Phone Number (Optional)</label>
+            <label className="form-label">
+              Secondary Phone Number (Optional)
+            </label>
             <Input
               type="text"
               value={editedStation.phoneNumber2 || ""}

@@ -13,9 +13,9 @@ import {
 } from "ag-grid-community";
 import { ServiceRecordInterface } from "../types/ServiceRecord.Interface";
 import { Trash2, Download, Search, Eye, Edit } from "lucide-react";
-import ConfirmationDialog from "../../../components/ConfirmationDialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import ConfirmationDialog from "../../../Components/ConfirmationDialog";
+import { Button } from "../../../Components/ui/button";
+import { Input } from "../../../Components/ui/input";
 import {
   fetchServiceRecords,
   deleteServiceRecord,
@@ -97,6 +97,7 @@ const ServiceRecordGrid = () => {
         )
       );
       toast.success("Service record updated successfully!");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Error updating service record");
     }
@@ -219,6 +220,7 @@ const ServiceRecordGrid = () => {
       // Remove the deleted record from state
       setRowData((prevData) => prevData.filter((record) => record._id !== deleteId));
       toast.success("Service record deleted successfully!");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error: any) {
       toast.error("Error! Deleting the service record");
     } finally {
@@ -293,7 +295,4 @@ const ServiceRecordGrid = () => {
 };
 
 export default ServiceRecordGrid;
-function saveServiceRecord(updatedRecord: ServiceRecordInterface) {
-  throw new Error("Function not implemented.");
-}
 
